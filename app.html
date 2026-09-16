@@ -117,8 +117,18 @@ a { color: inherit; text-decoration: none; -webkit-user-select: none; user-selec
 input { font: inherit; color: inherit; }
 ::selection { background: var(--accent); color: #fff; }
 
+/* =========================================================
+   FOCUS / OUTLINE — kill all rings and highlights
+   ========================================================= */
 a:focus, button:focus, input:focus { outline: none; }
-a:focus-visible, button:focus-visible, input:focus-visible {
+input:focus,
+input:focus-visible,
+input:active {
+  outline: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+}
+a:focus-visible, button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
@@ -434,7 +444,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 
 /* =========================================================
-   PHONE FIELD — fixed spacing + alignment + iOS zoom prevention
+   PHONE FIELD — no ring, no box on focus
    ========================================================= */
 .field__wrap {
   display: flex;
@@ -443,14 +453,15 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 999px;
   min-height: 52px;
-  padding: 0 18px 0 18px;
-  gap: 0;
-  transition: border-color .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
+  padding: 0 18px;
+  transition: border-color .2s var(--ease), background .2s var(--ease);
 }
+/* Focus: only a subtle border tint — no shadow ring, no box */
 .field__wrap:focus-within {
-  border-color: rgba(255,77,0,.55);
-  background: rgba(255,77,0,.04);
-  box-shadow: 0 0 0 4px rgba(255,77,0,.1);
+  border-color: rgba(255,77,0,.45);
+  background: rgba(255,255,255,.055);
+  box-shadow: none;
+  outline: none;
 }
 .field__wrap.error {
   border-color: rgba(255,77,0,.7);
@@ -507,6 +518,16 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   appearance: none;
   -webkit-appearance: none;
   font-variant-numeric: tabular-nums;
+  /* Kill every possible focus ring / box */
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.field__input:focus,
+.field__input:focus-visible,
+.field__input:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
 }
 .field__input::placeholder {
   color: rgba(244,241,232,.28);
@@ -1465,9 +1486,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 (function () {
   "use strict";
 
-  /* =========================================================
-     LOGOUT MODAL
-     ========================================================= */
+  /* LOGOUT MODAL */
   var logoutModal    = document.getElementById("logoutModal");
   var logoutBtn      = document.getElementById("logoutBtn");
   var cancelLogout   = document.getElementById("cancelLogout");
@@ -1509,9 +1528,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     }
   });
 
-  /* =========================================================
-     CONFIG
-     ========================================================= */
+  /* CONFIG */
   var WORKER_URL = "https://smsbomber.ethical-laxman.workers.dev/";
   var GATEWAYS = [
     { id: "clamphook",   label: "Clamphook",   slug: "clamphook.com" },
@@ -1534,9 +1551,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   var MAX_COUNT_SINGLE = 10;
   var MAX_COUNT_BULK = 5;
 
-  /* =========================================================
-     DOM
-     ========================================================= */
+  /* DOM */
   var form            = document.getElementById("sendForm");
   var singlePane      = document.getElementById("singlePane");
   var bulkPane        = document.getElementById("bulkPane");
@@ -1573,16 +1588,12 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   var statusPill      = document.getElementById("statusPill");
   var terminalCol     = document.getElementById("terminalCol");
 
-  /* =========================================================
-     STATE
-     ========================================================= */
+  /* STATE */
   var state = { sendMode: "single", gwMode: "auto", count: 1 };
   var bulkNumbers = [];
   var isSending = false;
 
-  /* =========================================================
-     UTILS
-     ========================================================= */
+  /* UTILS */
   function isValidNepaliPhone(v) { return /^(98|97)\d{8}$/.test(v); }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function pad(n, w) { n = String(n); while (n.length < w) n = "0" + n; return n; }
@@ -1591,9 +1602,6 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     return pad(d.getHours(), 2) + ":" + pad(d.getMinutes(), 2) + ":" + pad(d.getSeconds(), 2);
   }
 
-  /* =========================================================
-     TERMINAL — scroll into view when flow starts on mobile
-     ========================================================= */
   function scrollToTerminalIfMobile() {
     if (window.matchMedia("(max-width: 1023px)").matches) {
       requestAnimationFrame(function () {
@@ -1604,9 +1612,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     }
   }
 
-  /* =========================================================
-     TERMINAL WRITER
-     ========================================================= */
+  /* TERMINAL WRITER */
   function termLine(text, kind) {
     var line = document.createElement("div");
     line.className = "tl" + (kind ? " tl--" + kind : "");
@@ -1691,9 +1697,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     }, 6000);
   }
 
-  /* =========================================================
-     MODE TOGGLES
-     ========================================================= */
+  /* MODE TOGGLES */
   function setSendMode(val) {
     if (val === state.sendMode) return;
     state.sendMode = val;
@@ -1751,9 +1755,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     });
   });
 
-  /* =========================================================
-     BULK
-     ========================================================= */
+  /* BULK */
   function createNumberRow(value) {
     var row = document.createElement("div");
     row.className = "bulk-row";
@@ -1905,9 +1907,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     setFileStatus(msg, added === 0);
   }
 
-  /* =========================================================
-     COUNT
-     ========================================================= */
+  /* COUNT */
   function maxCount() { return state.sendMode === "bulk" ? MAX_COUNT_BULK : MAX_COUNT_SINGLE; }
   function updateCount() {
     countVal.textContent = state.count;
@@ -1922,9 +1922,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     if (state.count < maxCount()) { state.count++; updateCount(); }
   });
 
-  /* =========================================================
-     PHONE VALIDATION
-     ========================================================= */
+  /* PHONE */
   function validatePhone() {
     var ok = isValidNepaliPhone(phoneInput.value.replace(/\D/g, ""));
     phoneRow.classList.toggle("error", !ok);
@@ -1947,9 +1945,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     }
   });
 
-  /* =========================================================
-     DISABLE / ENABLE
-     ========================================================= */
+  /* DISABLE / ENABLE */
   function setControlsDisabled(disabled) {
     countMinus.disabled = disabled || state.count <= 1;
     countPlus.disabled = disabled || state.count >= maxCount();
@@ -1965,9 +1961,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     phoneInput.disabled = disabled;
   }
 
-  /* =========================================================
-     RUN FLOW
-     ========================================================= */
+  /* RUN FLOW */
   async function runFlow(phones, perNumber, gwMode, manualIds) {
     isSending = true;
     setControlsDisabled(true);
@@ -2120,9 +2114,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     }
   }
 
-  /* =========================================================
-     SUBMIT
-     ========================================================= */
+  /* SUBMIT */
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     if (isSending) return;
@@ -2157,9 +2149,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     runFlow(phones, state.count, state.gwMode, manualIds);
   });
 
-  /* =========================================================
-     INIT
-     ========================================================= */
+  /* INIT */
   createNumberRow("");
   syncBulkFromDOM();
 
