@@ -73,7 +73,13 @@
   --ease-out: cubic-bezier(.16,1,.3,1);
   --max:      1760px;
   --nav-h:    66px;
+  --radius-lg: 22px;
 }
+
+/* =========================================================
+   RESET
+   ========================================================= */
+[hidden] { display: none !important; }
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -99,14 +105,23 @@ body {
   min-height: 100dvh;
   overflow-x: hidden;
 }
+body.modal-open { overflow: hidden; }
+
 img, svg { display: block; max-width: 100%; }
-button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; -webkit-user-select: none; user-select: none; }
+button {
+  font: inherit; color: inherit; background: none; border: 0;
+  cursor: pointer; padding: 0;
+  -webkit-user-select: none; user-select: none;
+}
 a { color: inherit; text-decoration: none; -webkit-user-select: none; user-select: none; }
 input { font: inherit; color: inherit; }
 ::selection { background: var(--accent); color: #fff; }
 
 a:focus, button:focus, input:focus { outline: none; }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 
 /* =========================================================
    NAV
@@ -131,7 +146,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   height: var(--nav-h);
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .logo {
@@ -178,7 +193,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   flex-shrink: 0;
 }
 
-.nav__spacer { flex: 1; }
+.nav__spacer { flex: 1; min-width: 0; }
 
 .status-pill {
   font-family: var(--font-mono);
@@ -195,6 +210,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   transition: all .25s var(--ease);
   flex-shrink: 0;
   background: rgba(255,255,255,.55);
+  white-space: nowrap;
 }
 .status-pill::before {
   content: "";
@@ -202,6 +218,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   height: 7px;
   border-radius: 50%;
   background: currentColor;
+  flex-shrink: 0;
   transition: all .25s var(--ease);
 }
 .status-pill.running { border-color: rgba(255,77,0,.45); color: var(--accent); background: rgba(255,77,0,.07); }
@@ -228,12 +245,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease), transform .15s var(--ease);
   flex-shrink: 0;
   min-height: 38px;
+  white-space: nowrap;
 }
-.nav__logout:hover {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
+.nav__logout:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 .nav__logout:active { transform: scale(.97); }
 .nav__logout svg {
   width: 14px;
@@ -243,21 +257,21 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
+  flex-shrink: 0;
 }
 
 @media (max-width: 860px) {
   .nav__divider, .nav__page { display: none; }
 }
 @media (max-width: 640px) {
-  :root { --nav-h: 58px; }
+  :root { --nav-h: 58px; --radius-lg: 20px; }
   .nav__inner { gap: 8px; padding-inline: 14px; }
   .logo { font-size: 15px; gap: 8px; }
   .logo__mark { width: 30px; height: 30px; border-radius: 9px; }
   .logo__mark svg { width: 16px; height: 16px; }
   .status-pill { font-size: 9px; padding: 5px 10px; letter-spacing: .12em; }
-  .status-pill span.label { display: none; }
-  .nav__logout { padding: 7px 10px; font-size: 9px; min-height: 34px; }
-  .nav__logout span.label { display: none; }
+  .nav__logout { padding: 7px 11px; font-size: 9px; min-height: 34px; }
+  .nav__logout .label { display: none; }
 }
 
 /* =========================================================
@@ -271,17 +285,16 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 .workspace::before {
   content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 30% 0%, rgba(255,77,0,.12), transparent 55%),
-              radial-gradient(circle at 70% 100%, rgba(223,255,0,.04), transparent 50%);
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 30% 0%, rgba(255,77,0,.12), transparent 55%),
+    radial-gradient(circle at 70% 100%, rgba(223,255,0,.04), transparent 50%);
   pointer-events: none;
   z-index: 0;
 }
 .workspace::after {
   content: "";
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background-image:
     linear-gradient(to right, rgba(244,241,232,.025) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(244,241,232,.025) 1px, transparent 1px);
@@ -304,26 +317,18 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   align-items: start;
 }
 
-/* =========================================================
-   DESKTOP — fit to viewport, no scroll
-   ========================================================= */
+/* Desktop: fit viewport, no page scroll */
 @media (min-width: 1024px) {
   html, body {
     height: 100%;
     overflow: hidden;
   }
-  body {
-    display: flex;
-    flex-direction: column;
-  }
-
+  body { display: flex; flex-direction: column; }
   .workspace {
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
-    padding: 0;
   }
-
   .workspace__inner {
     height: 100%;
     min-height: 0;
@@ -333,82 +338,87 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
     padding-top: clamp(16px, 2vw, 28px);
     padding-bottom: clamp(16px, 2vw, 28px);
   }
-
   .form-col {
     max-width: none;
     margin: 0;
     min-height: 0;
+    height: 100%;
     display: flex;
     flex-direction: column;
   }
-
-  .form {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .form::-webkit-scrollbar { display: none; }
-
   .terminal-col {
     min-height: 0;
     height: 100%;
     display: flex;
     flex-direction: column;
-    position: static;
-  }
-
-  .terminal {
-    flex: 1 1 auto;
-    height: auto;
-    min-height: 0;
-    max-height: none;
   }
 }
 
-/* Tablet/mobile container */
+/* Tablet/Mobile: natural page scroll, terminal always visible */
 @media (max-width: 1023px) {
-  .terminal-col { display: none; }
-  .terminal-col.visible { display: block; animation: terminalIn .4s var(--ease-out); }
-  @keyframes terminalIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+  .workspace__inner {
+    padding: 16px 16px 32px;
+    gap: 16px;
   }
+  .form-col { max-width: 640px; margin-inline: auto; width: 100%; }
+  .terminal-col { width: 100%; }
+}
+@media (max-width: 640px) {
+  .workspace__inner { padding: 14px 14px 28px; gap: 14px; }
 }
 
 /* =========================================================
    FORM
    ========================================================= */
-.form-col {
-  width: 100%;
-  max-width: 560px;
-  margin-inline: auto;
-}
+.form-col { width: 100%; max-width: 560px; margin-inline: auto; }
 
 .form {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 1.4vw, 16px);
-  background: linear-gradient(180deg, rgba(255,255,255,.03) 0%, rgba(255,255,255,.01) 100%);
+  min-height: 0;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(255,255,255,.06);
-  border-radius: 22px;
-  padding: clamp(18px, 2vw, 24px);
-  position: relative;
+  background: linear-gradient(180deg, rgba(255,255,255,.03) 0%, rgba(255,255,255,.01) 100%);
+  overflow: hidden;
 }
 .form::before {
   content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 22px;
+  position: absolute; inset: 0;
+  border-radius: inherit;
   padding: 1px;
   background: linear-gradient(135deg, rgba(255,77,0,.15), transparent 40%, transparent 60%, rgba(223,255,0,.06));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
   pointer-events: none;
+  z-index: 1;
 }
 
+.form__scroll {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 16px);
+  padding: clamp(16px, 2vw, 24px);
+  min-height: 0;
+  position: relative;
+  z-index: 0;
+}
+@media (min-width: 1024px) {
+  .form { flex: 1 1 auto; }
+  .form__scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .form__scroll::-webkit-scrollbar { display: none; }
+}
+
+/* =========================================================
+   FIELDS
+   ========================================================= */
 .field {
   display: flex;
   flex-direction: column;
@@ -423,6 +433,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   padding-left: 6px;
 }
 
+/* =========================================================
+   PHONE FIELD — fixed spacing + alignment + iOS zoom prevention
+   ========================================================= */
 .field__wrap {
   display: flex;
   align-items: center;
@@ -430,7 +443,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 999px;
   min-height: 52px;
-  padding: 0 20px;
+  padding: 0 18px 0 18px;
+  gap: 0;
   transition: border-color .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
 }
 .field__wrap:focus-within {
@@ -442,13 +456,17 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   border-color: rgba(255,77,0,.7);
   background: rgba(255,77,0,.06);
 }
+
 .field__icon {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  margin-right: 12px;
+  margin-right: 10px;
   color: rgba(244,241,232,.4);
   transition: color .2s var(--ease);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .field__wrap:focus-within .field__icon { color: var(--accent); }
 .field__icon svg {
@@ -459,6 +477,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
 .field__prefix {
   font-family: var(--font-mono);
   font-size: 14px;
@@ -466,10 +485,14 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   color: rgba(244,241,232,.75);
   margin-right: 8px;
   flex-shrink: 0;
-  letter-spacing: .02em;
+  letter-spacing: 0;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
 }
+
 .field__input {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   background: transparent;
   border: 0;
@@ -477,13 +500,19 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   color: var(--bg);
   font-family: var(--font-mono);
   font-size: 15px;
-  letter-spacing: .08em;
-  padding: 13px 0;
+  letter-spacing: 0;
+  line-height: 1.4;
+  padding: 14px 0;
   border-radius: 0;
   appearance: none;
   -webkit-appearance: none;
+  font-variant-numeric: tabular-nums;
 }
-.field__input::placeholder { color: rgba(244,241,232,.28); }
+.field__input::placeholder {
+  color: rgba(244,241,232,.28);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
 .field__input:-webkit-autofill,
 .field__input:-webkit-autofill:hover,
 .field__input:-webkit-autofill:focus {
@@ -491,6 +520,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   -webkit-box-shadow: 0 0 0 1000px var(--ink) inset;
   transition: background-color 9999s ease-out;
 }
+
 .field__error {
   display: none;
   font-family: var(--font-mono);
@@ -502,6 +532,14 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 .field__error.show { display: block; }
 
+/* iOS: 16px min font to prevent auto-zoom on focus */
+@supports (-webkit-touch-callout: none) {
+  .field__input { font-size: 16px; }
+}
+
+/* =========================================================
+   SEGMENTED CONTROL
+   ========================================================= */
 .seg {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -538,6 +576,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 .seg__opt:hover:not(.checked) { color: var(--bg); background: rgba(255,255,255,.04); }
 
+/* =========================================================
+   COUNT STEPPER
+   ========================================================= */
 .count {
   display: flex;
   align-items: center;
@@ -572,16 +613,21 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   font-family: var(--font-mono);
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: .04em;
+  letter-spacing: 0;
   color: var(--bg);
+  font-variant-numeric: tabular-nums;
 }
 
+/* =========================================================
+   BULK
+   ========================================================= */
 .bulk-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
   max-height: 200px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding-right: 4px;
 }
 .bulk-list::-webkit-scrollbar { width: 3px; }
@@ -592,8 +638,13 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   align-items: stretch;
   animation: rowIn .25s var(--ease-out);
 }
-@keyframes rowIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-.bulk-row .field__wrap { flex: 1; min-width: 0; min-height: 48px; padding: 0 16px; }
+@keyframes rowIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.bulk-row .field__wrap { flex: 1; min-width: 0; min-height: 48px; padding: 0 14px; }
+.bulk-row .field__prefix { font-size: 13px; margin-right: 6px; }
+.bulk-row .field__input { padding: 12px 0; }
 .bulk-row.invalid .field__wrap {
   border-color: rgba(248,113,113,.6);
   background: rgba(248,113,113,.06);
@@ -642,6 +693,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   align-items: center;
   justify-content: center;
   gap: 6px;
+  white-space: nowrap;
 }
 .btn-mini:hover:not(:disabled) { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
 .btn-mini:disabled { opacity: .35; cursor: not-allowed; }
@@ -653,15 +705,13 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
+  flex-shrink: 0;
 }
 
-/* File input hidden */
 .file-input-hidden {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
+  width: 1px; height: 1px;
+  opacity: 0; pointer-events: none;
   overflow: hidden;
 }
 
@@ -675,7 +725,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 .bulk-count strong { color: var(--accent); }
 
-/* File upload status */
 .file-status {
   display: none;
   margin-top: 8px;
@@ -697,6 +746,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+/* =========================================================
+   GATEWAY PICKER
+   ========================================================= */
 .gw-picker {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -705,7 +757,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 .gw-opt {
   display: flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 10px 10px;
+  padding: 10px;
   border: 1px solid rgba(255,255,255,.08);
   background: rgba(255,255,255,.045);
   color: var(--bg);
@@ -731,6 +783,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 .gw-opt:hover:not(.checked) { background: rgba(255,255,255,.08); }
 
+/* =========================================================
+   TERMS
+   ========================================================= */
 .terms {
   display: flex;
   align-items: flex-start;
@@ -787,6 +842,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 .terms.error { border-color: rgba(255,77,0,.5); background: rgba(255,77,0,.06); }
 .terms.error .terms__box { border-color: var(--accent); }
 
+/* =========================================================
+   CTA
+   ========================================================= */
 .cta {
   position: relative;
   display: block;
@@ -799,6 +857,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   cursor: pointer;
   transition: transform .2s var(--ease), opacity .2s var(--ease);
   touch-action: manipulation;
+  border: 0;
 }
 .cta:hover:not(:disabled) { transform: translateY(-2px); }
 .cta:active:not(:disabled) { transform: translateY(0); }
@@ -829,27 +888,34 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: transform .25s var(--ease);
+  flex-shrink: 0;
 }
 .cta:hover:not(:disabled) .cta__inner svg { transform: translateX(3px); }
 
 /* =========================================================
    TERMINAL
    ========================================================= */
-.terminal-col {
-  width: 100%;
-  min-width: 0;
-}
+.terminal-col { width: 100%; min-width: 0; }
 
 .terminal {
   display: flex;
   flex-direction: column;
   background: var(--ink-2);
   border: 1px solid rgba(255,255,255,.08);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 30px 80px -30px rgba(0,0,0,.6),
-              inset 0 1px 0 rgba(255,255,255,.04);
-  height: clamp(420px, 65vh, 720px);
+  box-shadow:
+    0 30px 80px -30px rgba(0,0,0,.6),
+    inset 0 1px 0 rgba(255,255,255,.04);
+  height: clamp(360px, 55vh, 560px);
+}
+@media (min-width: 1024px) {
+  .terminal {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
 }
 
 .term-bar {
@@ -890,10 +956,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 .term-bar__meta::before {
   content: "";
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: rgba(244,241,232,.4);
+  flex-shrink: 0;
 }
 .term-bar__meta.idle::before { background: rgba(244,241,232,.4); }
 .term-bar__meta.running { color: var(--accent); }
@@ -902,33 +968,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 .term-bar__meta.done::before { background: var(--ok); }
 .term-bar__meta.err { color: var(--err); }
 .term-bar__meta.err::before { background: var(--err); }
-
-.term-bar__close {
-  display: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: rgba(255,255,255,.06);
-  color: rgba(244,241,232,.7);
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background .18s var(--ease), color .18s var(--ease);
-}
-.term-bar__close:hover { background: var(--err); color: var(--ink); }
-.term-bar__close:disabled { opacity: .35; cursor: not-allowed; }
-.term-bar__close svg {
-  width: 14px;
-  height: 14px;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-@media (max-width: 1023px) {
-  .term-bar__close { display: flex; }
-}
 
 .term-body {
   flex: 1 1 auto;
@@ -942,6 +981,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   color: var(--bg);
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .term-body::-webkit-scrollbar { width: 6px; }
 .term-body::-webkit-scrollbar-track { background: transparent; }
@@ -955,7 +995,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   word-break: break-word;
   animation: tlIn .18s var(--ease-out);
 }
-@keyframes tlIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes tlIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 .tl__t { color: rgba(244,241,232,.3); flex-shrink: 0; user-select: none; font-size: .88em; }
 .tl__m { flex: 1; min-width: 0; }
 
@@ -1040,7 +1083,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   max-width: 400px;
   background: var(--bg);
   color: var(--ink);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   padding: clamp(22px, 3vw, 32px);
   box-shadow:
     0 30px 80px -30px rgba(0,0,0,.5),
@@ -1050,12 +1093,11 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 }
 @keyframes cardPop {
   from { opacity: 0; transform: translateY(20px) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .modal__icon {
-  width: 56px;
-  height: 56px;
+  width: 56px; height: 56px;
   margin: 0 auto 18px;
   border-radius: 50%;
   background: rgba(255,77,0,.1);
@@ -1066,8 +1108,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   justify-content: center;
 }
 .modal__icon svg {
-  width: 26px;
-  height: 26px;
+  width: 26px; height: 26px;
   stroke: currentColor;
   stroke-width: 2;
   fill: none;
@@ -1084,7 +1125,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   margin: 0 0 8px;
   color: var(--ink);
 }
-
 .modal__desc {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -1093,13 +1133,11 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   line-height: 1.55;
   margin: 0 0 24px;
 }
-
 .modal__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
-
 .modal__btn {
   display: flex;
   align-items: center;
@@ -1117,7 +1155,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   border: 1.5px solid transparent;
 }
 .modal__btn:active { transform: scale(.97); }
-
 .modal__btn--ghost {
   background: transparent;
   color: var(--ink);
@@ -1127,40 +1164,58 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   background: rgba(17,17,17,.06);
   border-color: rgba(17,17,17,.3);
 }
-
 .modal__btn--danger {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
   box-shadow: 0 4px 14px rgba(255,77,0,.25);
 }
-.modal__btn--danger:hover {
-  background: #e64500;
-  border-color: #e64500;
+.modal__btn--danger:hover { background: #e64500; border-color: #e64500; }
+
+/* =========================================================
+   SHORT VIEWPORTS
+   ========================================================= */
+@media (min-width: 1024px) and (max-height: 720px) {
+  .form__scroll { padding: 14px 18px; gap: 10px; }
+  .field__wrap { min-height: 46px; padding: 0 16px; }
+  .field__input { padding: 11px 0; font-size: 14px; }
+  .seg { min-height: 44px; padding: 3px; }
+  .seg__opt { min-height: 38px; padding: 6px 10px; font-size: 10px; }
+  .count { min-height: 46px; padding: 3px; }
+  .count__btn { width: 40px; height: 40px; font-size: 18px; }
+  .count__val { font-size: 16px; }
+  .bulk-row .field__wrap { min-height: 42px; padding: 0 12px; }
+  .bulk-row__del { width: 42px; }
+  .btn-mini { min-height: 38px; font-size: 9px; padding: 6px 10px; }
+  .gw-opt { min-height: 38px; padding: 8px; font-size: 9px; }
+  .terms { padding: 9px 12px; }
+  .terms__text { font-size: 10px; }
+  .cta { min-height: 50px; }
+  .cta__inner { min-height: 46px; font-size: 12px; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .terminal { height: clamp(240px, 70vh, 400px); }
 }
 
 /* =========================================================
-   MOBILE ADJUSTMENTS (scrollable, compact)
+   MOBILE
    ========================================================= */
 @media (max-width: 640px) {
-  .workspace { padding: 14px 0 28px; }
-  .workspace__inner { padding-inline: 14px; gap: 14px; }
-  .form-col { max-width: 100%; }
-  .form {
-    padding: 16px 14px;
-    border-radius: 20px;
-    gap: 12px;
-  }
+  .form__scroll { padding: 14px 14px 18px; gap: 12px; }
 
   .field__wrap { min-height: 50px; padding: 0 16px; }
-  .field__input { padding: 12px 0; font-size: 15px; }
+  .field__icon { width: 17px; height: 17px; margin-right: 9px; }
+  .field__prefix { font-size: 13.5px; margin-right: 7px; }
+  .field__input { padding: 13px 0; font-size: 16px; }
+
   .seg { min-height: 48px; padding: 3px; }
-  .seg__opt { min-height: 42px; padding: 8px 12px; }
+  .seg__opt { min-height: 42px; padding: 8px 12px; font-size: 10.5px; }
   .count { min-height: 50px; padding: 3px; }
-  .count__btn { width: 44px; height: 44px; }
+  .count__btn { width: 44px; height: 44px; font-size: 19px; }
   .count__val { font-size: 17px; }
 
-  .bulk-row .field__wrap { min-height: 46px; padding: 0 14px; }
+  .bulk-row .field__wrap { min-height: 46px; padding: 0 13px; }
   .bulk-row__del { width: 46px; }
   .btn-mini { min-height: 42px; font-size: 9.5px; padding: 8px 10px; }
 
@@ -1172,21 +1227,25 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 
   .cta { min-height: 54px; }
   .cta__inner { min-height: 50px; font-size: 12px; gap: 8px; }
+  .cta__inner svg { width: 16px; height: 16px; }
 
-  .terminal { border-radius: 18px; height: clamp(340px, 55vh, 500px); }
+  .terminal { border-radius: 18px; height: clamp(320px, 50vh, 460px); }
   .term-bar { padding: 10px 12px; gap: 10px; font-size: 10px; }
   .term-bar__dot { width: 9px; height: 9px; }
   .term-bar__title { font-size: 10px; }
   .term-bar__meta { font-size: 9px; }
   .term-body { font-size: 11px; padding: 14px 14px 20px; }
-  .term-banner { font-size: 7.5px; }
+  .term-banner { font-size: 7.5px; margin-bottom: 10px; }
+  .tl { gap: 8px; }
+  .tl__t { font-size: .82em; }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 420px) {
   .bulk-actions { grid-template-columns: 1fr; }
   .gw-picker { grid-template-columns: 1fr; }
-  .term-banner { font-size: 7px; }
   .modal__actions { grid-template-columns: 1fr; }
+  .term-banner { font-size: 7px; }
+  .nav__logout { padding: 6px 9px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1236,118 +1295,132 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 
     <div class="form-col">
       <form class="form" id="sendForm" novalidate autocomplete="on">
+        <div class="form__scroll">
 
-        <div class="field">
-          <label class="field__label">Send mode</label>
-          <div class="seg" role="radiogroup" aria-label="Send mode">
-            <label class="seg__opt checked" data-mode="single">
-              <input type="radio" name="sendMode" value="single" checked />
-              <span>Single</span>
-            </label>
-            <label class="seg__opt" data-mode="bulk">
-              <input type="radio" name="sendMode" value="bulk" />
-              <span>Bulk</span>
-            </label>
-          </div>
-        </div>
-
-        <div id="singlePane">
           <div class="field">
-            <label class="field__label" for="phone">Nepal phone number</label>
-            <div class="field__wrap" id="phoneRow">
-              <span class="field__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <rect x="5" y="2" width="14" height="20" rx="2"/>
-                  <line x1="12" y1="18" x2="12.01" y2="18"/>
-                </svg>
-              </span>
-              <span class="field__prefix">+977</span>
-              <input type="tel" id="phone" class="field__input" placeholder="98XXXXXXXX" inputmode="numeric" pattern="[0-9]*" autocomplete="tel-national" maxlength="10" />
+            <label class="field__label">Send mode</label>
+            <div class="seg" role="radiogroup" aria-label="Send mode">
+              <label class="seg__opt checked" data-mode="single">
+                <input type="radio" name="sendMode" value="single" checked />
+                <span>Single</span>
+              </label>
+              <label class="seg__opt" data-mode="bulk">
+                <input type="radio" name="sendMode" value="bulk" />
+                <span>Bulk</span>
+              </label>
             </div>
-            <p class="field__error" id="phoneError">Enter a valid 10-digit number starting with 98 or 97</p>
           </div>
-        </div>
 
-        <div id="bulkPane" hidden>
+          <div id="singlePane">
+            <div class="field">
+              <label class="field__label" for="phone">Nepal phone number</label>
+              <div class="field__wrap" id="phoneRow">
+                <span class="field__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="5" y="2" width="14" height="20" rx="2"/>
+                    <line x1="12" y1="18" x2="12.01" y2="18"/>
+                  </svg>
+                </span>
+                <span class="field__prefix">+977</span>
+                <input
+                  type="tel"
+                  id="phone"
+                  class="field__input"
+                  placeholder="98XXXXXXXX"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  autocomplete="tel-national"
+                  maxlength="10"
+                  spellcheck="false"
+                  autocorrect="off"
+                  autocapitalize="off"
+                />
+              </div>
+              <p class="field__error" id="phoneError">Enter a valid 10-digit number starting with 98 or 97</p>
+            </div>
+          </div>
+
+          <div id="bulkPane" hidden>
+            <div class="field">
+              <label class="field__label">Phone numbers (bulk)</label>
+              <div class="bulk-list" id="numbersList"></div>
+              <div class="bulk-actions">
+                <button type="button" class="btn-mini" id="addNumberBtn">+ Add number</button>
+                <button type="button" class="btn-mini" id="clearNumbersBtn">Clear all</button>
+                <button type="button" class="btn-mini btn-mini--full" id="uploadBtn">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  Upload .txt (one number per line)
+                </button>
+                <input type="file" id="fileInput" class="file-input-hidden" accept=".txt,text/plain" />
+              </div>
+              <p class="bulk-count" id="numCount">0 numbers · <strong>0 valid</strong> · max 50</p>
+              <div class="file-status" id="fileStatus"></div>
+              <p class="field__error" id="bulkError">Add at least one valid number</p>
+            </div>
+          </div>
+
           <div class="field">
-            <label class="field__label">Phone numbers (bulk)</label>
-            <div class="bulk-list" id="numbersList"></div>
-            <div class="bulk-actions">
-              <button type="button" class="btn-mini" id="addNumberBtn">+ Add number</button>
-              <button type="button" class="btn-mini" id="clearNumbersBtn">Clear all</button>
-              <button type="button" class="btn-mini btn-mini--full" id="uploadBtn">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" y1="3" x2="12" y2="15"/>
-                </svg>
-                Upload .txt (one number per line)
-              </button>
-              <input type="file" id="fileInput" class="file-input-hidden" accept=".txt,text/plain" />
+            <label class="field__label" for="count" id="countLabel">Messages per number</label>
+            <div class="count" id="countWrap">
+              <button type="button" class="count__btn" id="countMinus" aria-label="Decrease">−</button>
+              <div class="count__val" id="countVal" aria-live="polite">1</div>
+              <button type="button" class="count__btn" id="countPlus" aria-label="Increase">+</button>
             </div>
-            <p class="bulk-count" id="numCount">0 numbers · <strong>0 valid</strong> · max 50</p>
-            <div class="file-status" id="fileStatus"></div>
-            <p class="field__error" id="bulkError">Add at least one valid number</p>
           </div>
-        </div>
 
-        <div class="field">
-          <label class="field__label" for="count" id="countLabel">Messages per number</label>
-          <div class="count" id="countWrap">
-            <button type="button" class="count__btn" id="countMinus" aria-label="Decrease">−</button>
-            <div class="count__val" id="countVal" aria-live="polite">1</div>
-            <button type="button" class="count__btn" id="countPlus" aria-label="Increase">+</button>
+          <div class="field">
+            <label class="field__label">Gateway selection</label>
+            <div class="seg" role="radiogroup" aria-label="Gateway selection">
+              <label class="seg__opt checked" data-gw="auto">
+                <input type="radio" name="gwMode" value="auto" checked />
+                <span>Auto</span>
+              </label>
+              <label class="seg__opt" data-gw="manual">
+                <input type="radio" name="gwMode" value="manual" />
+                <span>Manual</span>
+              </label>
+            </div>
           </div>
-        </div>
 
-        <div class="field">
-          <label class="field__label">Gateway selection</label>
-          <div class="seg" role="radiogroup" aria-label="Gateway selection">
-            <label class="seg__opt checked" data-gw="auto">
-              <input type="radio" name="gwMode" value="auto" checked />
-              <span>Auto</span>
-            </label>
-            <label class="seg__opt" data-gw="manual">
-              <input type="radio" name="gwMode" value="manual" />
-              <span>Manual</span>
-            </label>
+          <div class="field" id="gwField" hidden>
+            <label class="field__label">Pick gateways</label>
+            <div class="gw-picker" id="gwPicker">
+              <label class="gw-opt"><input type="checkbox" value="clamphook" /><span>Clamphook</span></label>
+              <label class="gw-opt"><input type="checkbox" value="ambition" /><span>Ambition</span></label>
+              <label class="gw-opt"><input type="checkbox" value="merodoctor" /><span>MeroDoctor</span></label>
+              <label class="gw-opt"><input type="checkbox" value="collegeinfo" /><span>CollegeInfo</span></label>
+              <label class="gw-opt"><input type="checkbox" value="pariksha" /><span>Pariksha</span></label>
+              <label class="gw-opt"><input type="checkbox" value="quickconnect" /><span>QuickConnect</span></label>
+            </div>
+            <p class="field__error" id="gwError">Select at least one gateway</p>
           </div>
+
+          <label class="terms" id="termsCheck" for="terms">
+            <input type="checkbox" id="terms" />
+            <span class="terms__box" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span class="terms__text">
+              I agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms</a>
+              and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.
+            </span>
+          </label>
+          <p class="field__error" id="termsError" style="margin-left:20px;margin-top:-6px">You must agree to continue</p>
+
+          <button type="submit" class="cta" id="sendBtn">
+            <span class="cta__inner" id="ctaInner">
+              <span>Send OTP</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </button>
+
         </div>
-
-        <div class="field" id="gwField" hidden>
-          <label class="field__label">Pick gateways</label>
-          <div class="gw-picker" id="gwPicker">
-            <label class="gw-opt"><input type="checkbox" value="clamphook" /><span>Clamphook</span></label>
-            <label class="gw-opt"><input type="checkbox" value="ambition" /><span>Ambition</span></label>
-            <label class="gw-opt"><input type="checkbox" value="merodoctor" /><span>MeroDoctor</span></label>
-            <label class="gw-opt"><input type="checkbox" value="collegeinfo" /><span>CollegeInfo</span></label>
-            <label class="gw-opt"><input type="checkbox" value="pariksha" /><span>Pariksha</span></label>
-            <label class="gw-opt"><input type="checkbox" value="quickconnect" /><span>QuickConnect</span></label>
-          </div>
-          <p class="field__error" id="gwError">Select at least one gateway</p>
-        </div>
-
-        <label class="terms" id="termsCheck" for="terms">
-          <input type="checkbox" id="terms" />
-          <span class="terms__box" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          </span>
-          <span class="terms__text">
-            I agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms</a>
-            and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.
-          </span>
-        </label>
-        <p class="field__error" id="termsError" style="margin-left:20px;margin-top:-6px">You must agree to continue</p>
-
-        <button type="submit" class="cta" id="sendBtn">
-          <span class="cta__inner" id="ctaInner">
-            <span>Send OTP</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </span>
-        </button>
-
       </form>
     </div>
 
@@ -1361,11 +1434,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
           </div>
           <div class="term-bar__title">SMS Adda <strong>~/send</strong> — live trace</div>
           <div class="term-bar__meta idle" id="termMeta">idle</div>
-          <button type="button" class="term-bar__close" id="termClose" aria-label="Close terminal">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12"/>
-            </svg>
-          </button>
         </div>
         <div class="term-body" id="termBody" role="log" aria-live="polite"></div>
       </div>
@@ -1408,9 +1476,14 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 
   function openLogoutModal() {
     logoutModal.classList.add("open");
-    setTimeout(function () { confirmLogout.focus(); }, 50);
+    document.body.classList.add("modal-open");
+    setTimeout(function () { confirmLogout.focus(); }, 60);
   }
-  function closeLogoutModal() { logoutModal.classList.remove("open"); }
+  function closeLogoutModal() {
+    logoutModal.classList.remove("open");
+    document.body.classList.remove("modal-open");
+    logoutBtn.focus();
+  }
 
   logoutBtn.addEventListener("click", openLogoutModal);
   cancelLogout.addEventListener("click", closeLogoutModal);
@@ -1419,8 +1492,21 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
     try { localStorage.removeItem("smsadda_user"); } catch (e) {}
     window.location.replace("/login.html");
   });
+
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && logoutModal.classList.contains("open")) closeLogoutModal();
+    if (!logoutModal.classList.contains("open")) return;
+    if (e.key === "Escape") { closeLogoutModal(); return; }
+    if (e.key === "Tab") {
+      var focusable = logoutModal.querySelectorAll("button, [href], [tabindex]:not([tabindex='-1'])");
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last  = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
   });
 
   /* =========================================================
@@ -1486,7 +1572,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   var termBody        = document.getElementById("termBody");
   var statusPill      = document.getElementById("statusPill");
   var terminalCol     = document.getElementById("terminalCol");
-  var termClose       = document.getElementById("termClose");
 
   /* =========================================================
      STATE
@@ -1505,14 +1590,12 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
     var d = new Date();
     return pad(d.getHours(), 2) + ":" + pad(d.getMinutes(), 2) + ":" + pad(d.getSeconds(), 2);
   }
-  function isMobile() { return window.matchMedia("(max-width: 1023px)").matches; }
 
   /* =========================================================
-     TERMINAL VISIBILITY
+     TERMINAL — scroll into view when flow starts on mobile
      ========================================================= */
-  function showTerminal() {
-    if (isMobile()) {
-      terminalCol.classList.add("visible");
+  function scrollToTerminalIfMobile() {
+    if (window.matchMedia("(max-width: 1023px)").matches) {
       requestAnimationFrame(function () {
         setTimeout(function () {
           terminalCol.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1520,14 +1603,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
       });
     }
   }
-  function hideTerminal() {
-    if (isSending) return;
-    terminalCol.classList.remove("visible");
-    clearTerm();
-    showBanner();
-    setTermMeta("idle", "idle");
-  }
-  termClose.addEventListener("click", hideTerminal);
 
   /* =========================================================
      TERMINAL WRITER
@@ -1642,7 +1717,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
     });
   });
 
-  /* ---- Gateway mode: auto hides entire gateway picker + clears selections ---- */
   function setGatewayMode(val) {
     state.gwMode = val;
     document.querySelectorAll('[data-gw]').forEach(function (l) {
@@ -1653,16 +1727,13 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
     });
 
     if (val === "auto") {
-      /* HIDE the picker field entirely */
       gwField.hidden = true;
       gwError.classList.remove("show");
-      /* Clear any prior manual selections */
       gwPicker.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
         cb.checked = false;
         cb.closest(".gw-opt").classList.remove("checked");
       });
     } else {
-      /* MANUAL: reveal picker */
       gwField.hidden = false;
     }
   }
@@ -1748,7 +1819,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
     updateNumCount();
   });
 
-  /* ---------- File upload ---------- */
   uploadBtn.addEventListener("click", function () {
     if (uploadBtn.disabled) return;
     fileInput.click();
@@ -1758,7 +1828,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
     var file = fileInput.files && fileInput.files[0];
     if (!file) return;
 
-    /* Loose extension check — some browsers give empty MIME */
     if (!/\.txt$/i.test(file.name) && file.type && file.type.indexOf("text") !== 0) {
       setFileStatus("Only .txt files are supported.", true);
       fileInput.value = "";
@@ -1779,11 +1848,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   });
 
   function parseBulkFile(text, filename) {
-    /* Split on newlines, handle Windows + Mac line endings too */
     var lines = text.split(/\r\n|\r|\n/);
 
     var existing = {};
-    /* Build set of already-present numbers */
     numbersList.querySelectorAll('input[type="tel"]').forEach(function (inp) {
       var v = inp.value.replace(/\D/g, "");
       if (v) existing[v] = true;
@@ -1797,10 +1864,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
       var raw = String(lines[i] || "").trim();
       if (!raw) continue;
 
-      /* Keep digits only, strip +977 / 977 / spaces / dashes */
       var digits = raw.replace(/\D/g, "");
       if (digits.startsWith("977")) digits = digits.slice(3);
-      /* Handle short numbers gracefully (some CSVs include leading country code twice) */
       if (digits.length > 10) digits = digits.slice(-10);
 
       if (!isValidNepaliPhone(digits)) { skipped++; continue; }
@@ -1810,7 +1875,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
       parsed.push(digits);
     }
 
-    /* Respect MAX_BULK */
     var currentCount = numbersList.querySelectorAll(".bulk-row").length;
     var space = MAX_BULK - currentCount;
     var added = 0;
@@ -1824,7 +1888,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 
     syncBulkFromDOM();
 
-    /* Report */
     if (added === 0 && parsed.length === 0 && skipped === 0 && duplicates === 0) {
       setFileStatus("The file appears to be empty.", true);
       return;
@@ -1860,7 +1923,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
   });
 
   /* =========================================================
-     PHONE
+     PHONE VALIDATION
      ========================================================= */
   function validatePhone() {
     var ok = isValidNepaliPhone(phoneInput.value.replace(/\D/g, ""));
@@ -1900,7 +1963,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
     clearNumbersBtn.disabled = disabled || numbersList.querySelectorAll(".bulk-row").length === 0;
     uploadBtn.disabled = disabled || numbersList.querySelectorAll(".bulk-row").length >= MAX_BULK;
     phoneInput.disabled = disabled;
-    termClose.disabled = disabled;
   }
 
   /* =========================================================
@@ -1914,7 +1976,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
     setTermMeta("running", "running");
     setStatusPill("running", "RUNNING");
 
-    showTerminal();
+    scrollToTerminalIfMobile();
     clearTerm();
     showBanner();
     await sleep(400);
@@ -2103,7 +2165,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 
   singlePane.hidden = false;
   bulkPane.hidden = true;
-  gwField.hidden = true;   /* auto mode default — gateway picker fully hidden */
+  gwField.hidden = true;
 
   updateCount();
   updateNumCount();
