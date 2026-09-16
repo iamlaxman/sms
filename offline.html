@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Offline — SMS Adda</title>
+<meta name="description" content="You're currently offline." />
+<meta name="author" content="Laxman Poudel" />
+<meta name="theme-color" content="#F4F1E8" />
+<meta name="robots" content="noindex, nofollow" />
+<style>
+:root {
+  --bg: #F4F1E8;
+  --bg-soft: #EDE8DC;
+  --ink: #111111;
+  --ink-soft: #333333;
+  --accent: #FF4D00;
+  --neutral: #E5E0D5;
+  --signal: #DFFF00;
+  --muted: #6b665c;
+  --border: 1px solid var(--ink);
+  --border-2: 2px solid var(--ink);
+  --gutter: clamp(16px, 4vw, 56px);
+  --nav-h: clamp(48px, 4.5vw, 58px);
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --shadow-offset: clamp(4px, 0.6vw, 8px);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(15px, 0.4vw + 13px, 17px);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh; min-height: 100svh; min-height: 100dvh;
+  display: flex; flex-direction: column;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+::selection { background: var(--accent); color: #fff; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.nav {
+  flex-shrink: 0;
+  background: var(--bg);
+  border-bottom: var(--border);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.nav__inner {
+  max-width: 1200px; margin-inline: auto; padding: 0 var(--gutter);
+  height: var(--nav-h); display: flex; align-items: center;
+}
+.nav__brand {
+  font-weight: 700; font-size: clamp(15px, 0.5vw + 13px, 19px);
+  letter-spacing: -0.01em;
+}
+.nav__brand-accent { color: var(--accent); margin-left: 2px; }
+
+.main {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(24px, 4vw, 64px) var(--gutter);
+  position: relative; overflow: hidden;
+}
+.main::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(17,17,17,.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17,17,17,.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%);
+  pointer-events: none;
+}
+.card {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 620px;
+  border: var(--border-2);
+  background: var(--bg);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--ink);
+  padding: clamp(28px, 4vw, 56px);
+}
+.tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: clamp(16px, 2vw, 24px);
+}
+.tag::before { content: ""; width: 28px; height: 1px; background: var(--accent); }
+
+.icon-wrap {
+  width: clamp(80px, 12vw, 120px);
+  height: clamp(80px, 12vw, 120px);
+  border: var(--border-2);
+  background: var(--signal);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: clamp(20px, 2.5vw, 32px);
+  position: relative;
+  overflow: hidden;
+}
+.icon-wrap svg {
+  width: 60%; height: 60%;
+  stroke: var(--ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.icon-wrap::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(255,77,0,.15) 60%);
+  pointer-events: none;
+}
+.title {
+  font-weight: 700;
+  font-size: clamp(26px, 3vw + 14px, 46px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  margin: 0 0 clamp(12px, 1.5vw, 18px);
+}
+.desc {
+  font-size: clamp(14px, 0.4vw + 13px, 17px);
+  color: var(--ink-soft);
+  margin: 0 0 clamp(20px, 3vw, 32px);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+.status {
+  border: var(--border);
+  background: var(--neutral);
+  padding: 12px 16px;
+  margin-bottom: clamp(20px, 2.5vw, 28px);
+  font-family: var(--font-mono); font-size: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.status__dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .35; }
+}
+.status__text { color: var(--ink); }
+.status__text strong { font-weight: 600; }
+
+.actions {
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 22px; min-height: 48px;
+  border: var(--border-2);
+  font-family: var(--font-mono); font-size: clamp(11px, 0.5vw + 10px, 13px);
+  font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  background: var(--accent); color: #fff; border-color: var(--accent);
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--ink);
+  background: var(--ink); border-color: var(--ink); color: var(--bg);
+}
+.btn--ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn--ghost:hover {
+  background: var(--ink); color: var(--bg);
+  box-shadow: 4px 4px 0 var(--accent);
+}
+.hint {
+  margin-top: clamp(20px, 3vw, 32px);
+  padding-top: clamp(16px, 2vw, 24px);
+  border-top: var(--border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hint ul {
+  list-style: none; margin: 10px 0 0; padding: 0;
+  display: flex; flex-direction: column; gap: 8px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-soft);
+}
+.hint li {
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.5;
+}
+.hint li::before {
+  content: "→";
+  position: absolute; left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  .status__dot { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="/index.html">SMS<span class="nav__brand-accent">ADDA</span></a>
+  </div>
+</header>
+
+<main class="main">
+  <div class="card">
+    <span class="tag">Status · Offline</span>
+
+    <div class="icon-wrap" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M2 8.82a15 15 0 0 1 20 0" />
+        <path d="M5 12.55a11 11 0 0 1 14 0" />
+        <path d="M8.5 16.42a6 6 0 0 1 7 0" />
+        <circle cx="12" cy="20" r="1.2" fill="currentColor" stroke="none" />
+        <line x1="3" y1="3" x2="21" y2="21" />
+      </svg>
+    </div>
+
+    <h1 class="title">You're offline.</h1>
+    <p class="desc">
+      SMS Adda needs an internet connection to reach the SMS gateways. Reconnect and try again — your work isn't lost.
+    </p>
+
+    <div class="status">
+      <span class="status__dot" aria-hidden="true"></span>
+      <span class="status__text" id="statusText"><strong>No connection detected.</strong> Waiting for the network to come back…</span>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn" id="retryBtn">Try again</button>
+      <a class="btn btn--ghost" href="/index.html">Back to home</a>
+    </div>
+
+    <div class="hint">
+      What to check
+      <ul>
+        <li>Wi-Fi or mobile data is turned on</li>
+        <li>Airplane mode is off</li>
+        <li>You're not behind a captive portal (hotel, café, airport)</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var retryBtn    = document.getElementById("retryBtn");
+  var statusText  = document.getElementById("statusText");
+  var statusDot   = document.querySelector(".status__dot");
+
+  /* ---- Try again: checks navigator.onLine ---- */
+  function tryReload() {
+    if (navigator.onLine) {
+      var back = document.referrer && document.referrer !== location.href
+        ? document.referrer
+        : "/index.html";
+      statusText.innerHTML = "<strong>Back online.</strong> Reloading…";
+      if (statusDot) statusDot.style.background = "var(--signal)";
+      setTimeout(function () { location.href = back; }, 400);
+    } else {
+      // visual "still offline" feedback
+      var original = statusText.innerHTML;
+      statusText.innerHTML = "<strong>Still offline.</strong> Check your connection and try again.";
+      if (statusDot) {
+        statusDot.style.background = "var(--muted)";
+        statusDot.style.animation = "none";
+        setTimeout(function () {
+          statusDot.style.background = "";
+          statusDot.style.animation = "";
+        }, 800);
+      }
+      setTimeout(function () { statusText.innerHTML = original; }, 2400);
+    }
+  }
+
+  retryBtn.addEventListener("click", tryReload);
+
+  /* ---- Auto-recover when the browser fires "online" ---- */
+  window.addEventListener("online", function () {
+    statusText.innerHTML = "<strong>Back online.</strong> Reloading…";
+    if (statusDot) statusDot.style.background = "var(--signal)";
+    setTimeout(function () { location.reload(); }, 600);
+  });
+
+  /* ---- Downgrade gracefully if the user loses connection while watching ---- */
+  window.addEventListener("offline", function () {
+    statusText.innerHTML = "<strong>Connection lost again.</strong> Still offline.";
+  });
+
+  /* ---- Initial state check ---- */
+  if (!navigator.onLine) {
+    // We're already offline; the page is already correct. Nothing to do.
+  } else {
+    // Page loaded while online — the user navigated here manually.
+    statusText.innerHTML = "<strong>You're online right now.</strong> Try again to continue.";
+  }
+})();
+</script>
+</body>
+</html>

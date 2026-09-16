@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <title>SMS Bomber NP — Demo Tool | smsbombernp.vercel.app</title>
+    <meta name="description" content="Educational SMS flooding demonstration tool. For security research purposes only.">
+    
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg">
+    <link rel="shortcut icon" href="/favicon/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="theme-color" content="#0f172a">
+
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getDatabase, ref, get, push } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxQ0_nu_g0ivWMc820w-mqRpq8JklxUoA",
+            authDomain: "sms-bomber-629df.firebaseapp.com",
+            databaseURL: "https://sms-bomber-629df-default-rtdb.firebaseio.com",
+            projectId: "sms-bomber-629df",
+            storageBucket: "sms-bomber-629df.firebasestorage.app",
+            messagingSenderId: "61309414303",
+            appId: "1:61309414303:web:59a2f5da91cfe9ecc86baa"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        window.db = db;
+    </script>
+
+    <style>
+        :root {
+            --bg: #f8fafc; --bg-secondary: #ffffff; --bg-tertiary: #f1f5f9;
+            --text: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8;
+            --border: #e2e8f0; --primary: #dc2626; --primary-hover: #b91c1c;
+            --primary-light: #fef2f2; --accent: #1e40af; --success: #059669;
+            --success-light: #d1fae5; --warning: #d97706;
+            --radius: 10px; --radius-lg: 14px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+            --transition: 0.25s ease;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        [data-theme="dark"] {
+            --bg: #0b1120; --bg-secondary: #111827; --bg-tertiary: #1e293b;
+            --text: #e2e8f0; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border: #1e293b; --primary: #ef4444; --primary-hover: #dc2626;
+            --primary-light: #450a0a; --accent: #3b82f6; --success-light: #064e3b;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0b1120; --bg-secondary: #111827; --bg-tertiary: #1e293b;
+                --text: #e2e8f0; --text-secondary: #94a3b8; --text-muted: #64748b;
+                --border: #1e293b; --primary: #ef4444; --primary-hover: #dc2626;
+                --primary-light: #450a0a; --accent: #3b82f6; --success-light: #064e3b;
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font); background: var(--bg); color: var(--text);
+            line-height: 1.6; -webkit-font-smoothing: antialiased;
+            transition: background 0.3s, color 0.3s; min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        .bg-pattern {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: -1; opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23000' fill-opacity='0.12'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .container { width: 100%; max-width: 720px; margin: 0 auto; padding: 0 16px; }
+
+        .navbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(248,250,252,0.88); backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
+        }
+        [data-theme="dark"] .navbar { background: rgba(11,17,32,0.9); }
+        .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+        .nav-brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1rem; color: var(--text); text-decoration: none; }
+        .nav-brand img { width: 28px; height: 28px; border-radius: 6px; }
+        .nav-brand span { color: var(--primary); }
+        .nav-back { display: flex; align-items: center; gap: 4px; color: var(--text-secondary); font-size: 0.82rem; font-weight: 500; text-decoration: none; padding: 6px 12px; border-radius: 6px; transition: var(--transition); }
+        .nav-back:hover { background: var(--bg-tertiary); color: var(--text); }
+        .nav-back svg { width: 15px; height: 15px; }
+        .theme-btn {
+            width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border);
+            background: transparent; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; color: var(--text-secondary); flex-shrink: 0;
+        }
+        .theme-btn:hover { background: var(--bg-tertiary); color: var(--text); }
+
+        .page-header { text-align: center; padding: 30px 0 10px; }
+        .page-header h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+        .page-header p { color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px; }
+
+        .tabs { display: flex; gap: 0; margin-bottom: 20px; border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .tab { flex: 1; padding: 10px; text-align: center; font-size: 0.8rem; font-weight: 600; cursor: pointer; background: var(--bg-secondary); color: var(--text-secondary); border: none; font-family: var(--font); transition: var(--transition); }
+        .tab.active { background: var(--primary); color: #fff; }
+        .tab:hover:not(.active) { background: var(--bg-tertiary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card {
+            background: var(--bg-secondary); border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1.5px solid var(--border); }
+        .card-header .icon { width: 38px; height: 38px; border-radius: 8px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; }
+        .card-header .icon svg { width: 18px; height: 18px; color: var(--primary); }
+        .card-header h2 { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+
+        .input-group { margin-bottom: 14px; }
+        .input-label { display: block; font-size: 0.76rem; font-weight: 600; margin-bottom: 4px; }
+        .input-field {
+            width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+            border-radius: var(--radius); font-size: 0.88rem; font-family: var(--font);
+            background: var(--bg); color: var(--text); outline: none; transition: var(--transition);
+        }
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(220,38,38,0.06); }
+        .input-field.error { border-color: var(--primary); }
+        textarea.input-field { resize: vertical; min-height: 100px; line-height: 1.5; }
+        .input-hint { font-size: 0.7rem; color: var(--text-muted); margin-top: 3px; }
+        .input-error { font-size: 0.7rem; color: var(--primary); margin-top: 3px; display: none; }
+        .input-success { font-size: 0.7rem; color: var(--success); margin-top: 3px; display: none; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 12px 24px; border-radius: var(--radius); font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; transition: var(--transition); border: 1.5px solid transparent;
+            font-family: var(--font); text-decoration: none; letter-spacing: -0.01em;
+        }
+        .btn-primary { background: var(--primary); color: #fff; width: 100%; }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-hover); box-shadow: 0 0 20px rgba(220,38,38,0.3); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .checkbox-group { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--primary); flex-shrink: 0; }
+        .checkbox-group label { font-size: 0.78rem; color: var(--text-secondary); cursor: pointer; }
+        .checkbox-group label a { color: var(--primary); font-weight: 600; text-decoration: underline; }
+        .checkbox-group label a:hover { color: var(--primary-hover); }
+
+        .captcha-wrap { display: flex; justify-content: center; margin-bottom: 12px; min-height: 65px; }
+
+        .terminal {
+            background: var(--bg); border: 1.5px solid var(--border);
+            border-radius: var(--radius); overflow: hidden; margin-top: 14px;
+        }
+        .terminal-head { display: flex; justify-content: space-between; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--border); background: var(--bg-secondary); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+        .terminal-body { padding: 10px 12px; max-height: 200px; overflow-y: auto; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.73rem; line-height: 1.5; }
+        .log-entry { display: flex; gap: 6px; padding: 1px 0; }
+        .log-time { color: var(--text-muted); font-size: 0.63rem; flex-shrink: 0; }
+        .log-ok { color: var(--success); } .log-err { color: var(--primary); } .log-info { color: var(--accent); } .log-warn { color: var(--warning); }
+
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px; }
+        .stat-mini { text-align: center; padding: 10px; border-radius: var(--radius); background: var(--bg-secondary); border: 1px solid var(--border); }
+        .stat-mini .val { font-size: 1.1rem; font-weight: 700; }
+        .stat-mini .lbl { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
+
+        .warning-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius); margin-bottom: 16px; font-size: 0.74rem; color: var(--primary); font-weight: 600; }
+        .warning-bar svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        .footer-bar { text-align: center; padding: 20px 0; font-size: 0.68rem; color: var(--text-muted); }
+
+        @media (max-width: 500px) {
+            .card { padding: 18px; }
+            .page-header { padding: 20px 0 5px; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-pattern"></div>
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="index.html" class="nav-brand"><img src="/favicon/favicon-96x96.png" alt="Logo" width="28" height="28">SMS<span>Bomber</span>NP</a>
+        <div style="display:flex;align-items:center;gap:10px">
+            <a href="index.html" class="nav-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back
+            </a>
+            <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <div class="page-header"><h1>SMS Demonstration Tool</h1><p>For educational security research only. Use at your own risk.</p></div>
+
+    <div class="warning-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Test only on your own number. Educational purposes only. We are not responsible for misuse.
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('single')">Single Number</button>
+        <button class="tab" onclick="switchTab('bulk')">Bulk Numbers</button>
+    </div>
+
+    <div class="tab-content active" id="tab-single">
+        <div class="card">
+            <div class="card-header"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><h2>Single Number</h2></div>
+            <div class="input-group"><label class="input-label">Phone Number</label><input type="text" class="input-field" id="phone" placeholder="98XXXXXXXX" maxlength="10" autocomplete="off" oninput="this.value=this.value.replace(/[^0-9]/g,'');validateSingle()"><div class="input-error" id="phoneError"></div><div class="input-success" id="phoneOk"></div></div>
+            <div class="input-group"><label class="input-label">Number of Messages</label><input type="number" class="input-field" id="count" value="1" min="1" max="20" onchange="validateSingle()"><div class="input-hint">Max 20 messages</div></div>
+            <div class="checkbox-group"><input type="checkbox" id="agreeSingle" onchange="validateSingle()"><label for="agreeSingle">I agree to the <a href="terms.html" target="_blank">Terms of Use</a> and <a href="privacy.html" target="_blank">Privacy Policy</a></label></div>
+            <div class="captcha-wrap"><div class="cf-turnstile" id="turnstileSingle" data-sitekey="0x4AAAAAAD7S1fLfF6jUjYZW" data-callback="onSingleCaptcha" data-expired-callback="onSingleCaptchaExpired"></div></div>
+            <button class="btn btn-primary" id="btnSingle" onclick="startSingle()" disabled>Send Messages</button>
+        </div>
+    </div>
+
+    <div class="tab-content" id="tab-bulk">
+        <div class="card">
+            <div class="card-header"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="8" y1="7" x2="8" y2="17"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="16" y1="7" x2="16" y2="17"/></svg></div><h2>Bulk Numbers</h2></div>
+            <div class="input-group"><label class="input-label">Phone Numbers (one per line)</label><textarea class="input-field" id="bulkNumbers" placeholder="9867844454&#10;9842308880&#10;9812345678" oninput="validateBulk()"></textarea><div class="input-hint" id="bulkCount"></div></div>
+            <div class="input-group"><label class="input-label">Messages per Number</label><input type="number" class="input-field" id="bulkPerNum" value="1" min="1" max="5" onchange="validateBulk()"><div class="input-hint">Max 5 per number</div></div>
+            <div class="checkbox-group"><input type="checkbox" id="agreeBulk" onchange="validateBulk()"><label for="agreeBulk">I agree to the <a href="terms.html" target="_blank">Terms of Use</a> and <a href="privacy.html" target="_blank">Privacy Policy</a></label></div>
+            <div class="captcha-wrap"><div class="cf-turnstile" id="turnstileBulk" data-sitekey="0x4AAAAAAD7S1fLfF6jUjYZW" data-callback="onBulkCaptcha" data-expired-callback="onBulkCaptchaExpired"></div></div>
+            <button class="btn btn-primary" id="btnBulk" onclick="startBulk()" disabled>Send Bulk Messages</button>
+        </div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-mini"><div class="val" id="statSent">0</div><div class="lbl">Sent</div></div>
+        <div class="stat-mini"><div class="val" id="statOk" style="color:var(--success)">0</div><div class="lbl">Delivered</div></div>
+        <div class="stat-mini"><div class="val" id="statFail" style="color:var(--primary)">0</div><div class="lbl">Failed</div></div>
+        <div class="stat-mini"><div class="val" id="statBlocked" style="color:var(--warning)">0</div><div class="lbl">Blocked</div></div>
+    </div>
+
+    <div class="terminal">
+        <div class="terminal-head">Output Log <button class="btn" style="width:auto;padding:2px 10px;font-size:0.6rem;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer" onclick="clearTerm()">Clear</button></div>
+        <div class="terminal-body" id="terminal"><div class="log-entry"><span class="log-time">--:--</span><span class="log-info">Ready. Enter a number and complete verification.</span></div></div>
+    </div>
+
+    <div class="footer-bar">&copy; 2026 SMS Bomber NP. Educational purposes only. smsbombernp.vercel.app</div>
+</main>
+
+<script>
+var stats={sent:0,ok:0,fail:0,blocked:0},isRunning=false,singleCaptcha=false,bulkCaptcha=false;
+var WORKER_URL = "https://smsbomber.ethical-laxman.workers.dev/";
+
+function onSingleCaptcha(t){singleCaptcha=true;validateSingle()}
+function onSingleCaptchaExpired(){singleCaptcha=false;validateSingle()}
+function onBulkCaptcha(t){bulkCaptcha=true;validateBulk()}
+function onBulkCaptchaExpired(){bulkCaptcha=false;validateBulk()}
+
+function switchTab(t){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});document.querySelectorAll('.tab-content').forEach(function(x){x.classList.remove('active')});document.getElementById('tab-'+t).classList.add('active');event.target.classList.add('active')}
+
+function VP(n){var c=n.replace(/[^0-9]/g,'');if(c.startsWith('977'))c=c.slice(3);var vp=['984','985','986','974','975','976','980','981','982','961','962','988','972','973','970'];return c.length===10&&(c.startsWith('98')||c.startsWith('97'))&&vp.indexOf(c.slice(0,3))!==-1?c:null}
+
+function log(m,t){var d=new Date().toLocaleTimeString('en-US',{hour12:false});var div=document.createElement('div');div.className='log-entry';var c=t==='ok'?'log-ok':t==='err'?'log-err':t==='warn'?'log-warn':'log-info';div.innerHTML='<span class="log-time">'+d+'</span><span class="'+c+'">'+m+'</span>';var term=document.getElementById('terminal');term.appendChild(div);if(term.children.length>120)term.removeChild(term.firstChild);term.scrollTop=term.scrollHeight}
+function CT(){document.getElementById('terminal').innerHTML='';log('Cleared.')}
+function US(){document.getElementById('statSent').textContent=stats.sent;document.getElementById('statOk').textContent=stats.ok;document.getElementById('statFail').textContent=stats.fail;document.getElementById('statBlocked').textContent=stats.blocked}
+
+function validateSingle(){
+    var p=document.getElementById('phone').value,v=VP(p),e=document.getElementById('phoneError'),s=document.getElementById('phoneOk');
+    e.style.display='none';s.style.display='none';if(p&&!v){e.textContent='Invalid Nepal number';e.style.display='block'}if(v){s.textContent='Valid number';s.style.display='block'}
+    document.getElementById('btnSingle').disabled=!(v&&document.getElementById('agreeSingle').checked&&singleCaptcha&&!isRunning);
+}
+function validateBulk(){
+    var nums=document.getElementById('bulkNumbers').value.split(/[\n,;\s]+/).filter(function(l){return l.trim()}).filter(function(l){return VP(l.trim())});
+    document.getElementById('bulkCount').textContent=nums.length+' valid numbers';
+    document.getElementById('btnBulk').disabled=!(nums.length>0&&document.getElementById('agreeBulk').checked&&bulkCaptcha&&!isRunning);
+}
+
+async function logToFirebase(phone,status,gateway){try{var d=window.db;if(!d)return;await push(ref(d,'sms_logs'),{phone:phone,status:status,gateway:gateway||'auto',timestamp:new Date().toISOString(),userAgent:navigator.userAgent.substring(0,100),referrer:document.referrer||'direct'})}catch(e){}}
+async function checkProtected(phone){try{var d=window.db;if(!d)return false;var s=await get(ref(d,'protected_numbers/'+phone));return s.exists()}catch(e){return false}}
+
+async function getFreshToken(widgetId){
+    return new Promise(function(resolve){
+        var w=typeof widgetId==='string'?turnstile:turnstile;
+        try{turnstile.reset(widgetId)}catch(e){}
+        var attempts=0;
+        var check=setInterval(function(){attempts++;var t=turnstile.getResponse(widgetId);if(t){clearInterval(check);resolve(t)}if(attempts>30){clearInterval(check);resolve(null)}},300);
+    });
+}
+
+async function sendOneMessage(phone,widgetId){
+    var isProtected=await checkProtected(phone);
+    if(isProtected){stats.blocked++;US();await logToFirebase(phone,'blocked','protected');return{ok:false,msg:"Number is protected"}}
+    var token=await getFreshToken(widgetId);
+    if(!token)return{ok:false,msg:"Verification timeout"};
+    try{var r=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone:phone,turnstileToken:token})});var d=await r.json();
+        if(d.ok){await logToFirebase(phone,'delivered',d.msg||'auto')}else{await logToFirebase(phone,'failed',d.msg||'unknown')}
+        return d;
+    }catch(e){return{ok:false,msg:"Network error"}}
+}
+
+async function startSingle(){
+    if(isRunning)return;var p=VP(document.getElementById('phone').value);if(!p)return;var n=parseInt(document.getElementById('count').value)||1;if(n>20)n=20;
+    isRunning=true;var btn=document.getElementById('btnSingle');btn.disabled=true;btn.textContent='Sending...';
+    log('Starting '+n+' messages to +977-'+p,'log-info');
+    for(var i=1;i<=n;i++){var r=await sendOneMessage(p,'#turnstileSingle');stats.sent++;if(r.ok){stats.ok++;log('#'+i+' Delivered','ok')}else{stats.fail++;log('#'+i+' '+r.msg,'err')}US();if(i<n)await new Promise(function(r){setTimeout(r,1500)})}
+    log('Done. '+stats.ok+' delivered, '+stats.fail+' failed, '+stats.blocked+' blocked.','ok');isRunning=false;btn.textContent='Send Messages';btn.disabled=false;
+    turnstile.reset('#turnstileSingle');singleCaptcha=false;validateSingle();
+}
+
+async function startBulk(){
+    if(isRunning)return;var nums=document.getElementById('bulkNumbers').value.split(/[\n,;\s]+/).filter(function(l){return l.trim()}).map(function(l){return VP(l.trim())}).filter(function(v){return v});
+    if(!nums.length)return;var perNum=parseInt(document.getElementById('bulkPerNum').value)||1;if(perNum>5)perNum=5;
+    isRunning=true;var btn=document.getElementById('btnBulk');btn.disabled=true;btn.textContent='Sending...';
+    log('Bulk: '+nums.length+' numbers x '+perNum+' each','log-info');
+    for(var ni=0;ni<nums.length;ni++){var num=nums[ni];log('--- +977-'+num+' ('+(ni+1)+'/'+nums.length+') ---');
+        for(var i=1;i<=perNum;i++){var r=await sendOneMessage(num,'#turnstileBulk');stats.sent++;if(r.ok){stats.ok++;log('#'+i+' Delivered','ok')}else{stats.fail++;log('#'+i+' '+r.msg,'err')}US();if(i<perNum)await new Promise(function(r){setTimeout(r,1500)})}}
+    log('Bulk done. '+stats.ok+' delivered, '+stats.fail+' failed, '+stats.blocked+' blocked.','ok');isRunning=false;btn.textContent='Send Bulk Messages';btn.disabled=false;
+    turnstile.reset('#turnstileBulk');bulkCaptcha=false;validateBulk();
+}
+
+function toggleTheme(){var h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');localStorage.setItem('theme',h.getAttribute('data-theme'))}
+(function(){var s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s)})();
+validateSingle();validateBulk();log('Connected to secure gateway. Protected numbers blocked.','ok');
+</script>
+</body>
+</html>

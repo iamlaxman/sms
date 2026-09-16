@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Sign In — SMS Adda</title>
+<meta name="description" content="Sign in to SMS Adda with your phone number." />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SMS Adda" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="robots" content="noindex, nofollow" />
+
+<link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
+<link rel="shortcut icon" href="/favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+<link rel="manifest" href="/favicon/site.webmanifest" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+/* =========================================================
+   TOKENS
+   ========================================================= */
+:root {
+  --bg:       #F4F1E8;
+  --ink:      #0a0a0a;
+  --accent:   #FF4D00;
+  --accent-2: #FF8A3D;
+  --neutral:  #E5E0D5;
+  --signal:   #DFFF00;
+  --muted:    #6b665c;
+
+  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --ease:     cubic-bezier(.2,.7,.2,1);
+  --ease-out: cubic-bezier(.16,1,.3,1);
+}
+
+/* Reset + mobile tap-highlight kill */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+}
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  font-family: var(--font-display);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+img, svg { display: block; max-width: 100%; }
+button {
+  font: inherit; color: inherit; background: none; border: 0;
+  cursor: pointer; padding: 0;
+  -webkit-user-select: none; user-select: none;
+}
+a {
+  color: inherit; text-decoration: none;
+  -webkit-user-select: none; user-select: none;
+}
+input { font: inherit; color: inherit; }
+::selection { background: var(--accent); color: #fff; }
+
+a:focus, button:focus, input:focus { outline: none; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* =========================================================
+   APP SHELL
+   ========================================================= */
+.app {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+/* =========================================================
+   BRAND SIDE (cream)
+   ========================================================= */
+.brand {
+  position: relative;
+  background: var(--bg);
+  color: var(--ink);
+  padding: clamp(20px, 4vw, 32px) clamp(20px, 5vw, 40px) clamp(50px, 10vw, 60px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 4vw, 32px);
+  overflow: visible;
+  z-index: 2;
+}
+.brand::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(17,17,17,.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17,17,17,.055) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 40% 30%, #000 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at 40% 30%, #000 30%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+.brand > * { position: relative; z-index: 1; }
+
+.brand__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: clamp(15px, 1.4vw + 12px, 17px);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  transition: transform .25s var(--ease);
+}
+.logo:hover { transform: translateY(-1px); }
+.logo__mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--ink);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform .25s var(--ease);
+}
+.logo:hover .logo__mark { transform: rotate(-6deg); }
+.logo__mark svg { width: 20px; height: 20px; fill: currentColor; }
+.logo__text { white-space: nowrap; }
+.logo__text em { font-style: normal; color: var(--accent); }
+
+.get-started {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(17,17,17,.18);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: transparent;
+  transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
+  white-space: nowrap;
+}
+.get-started:hover {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.get-started svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand__hero {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.6vw, 14px);
+  text-align: center;
+}
+.brand__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.brand__eyebrow::before,
+.brand__eyebrow::after {
+  content: "";
+  width: 20px;
+  height: 1px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.brand__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(38px, 9vw, 52px);
+  line-height: .95;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--ink);
+}
+.brand__subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin: 0;
+}
+
+.brand__stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: clamp(14px, 2.4vw, 20px);
+  border-top: 1px solid rgba(17,17,17,.12);
+}
+.brand__stat strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(16px, 1.4vw + 12px, 22px);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink);
+}
+.brand__stat strong em { font-style: normal; color: var(--accent); }
+.brand__stat span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* =========================================================
+   WAVES
+   ========================================================= */
+.wave {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+}
+.wave--h {
+  left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: clamp(50px, 11vw, 70px);
+  transform: translateY(70%);
+}
+.wave--h path { fill: var(--bg); }
+.wave--v {
+  top: 0; bottom: 0; left: 100%;
+  width: clamp(60px, 5vw, 90px);
+  height: 100%;
+  transform: translateX(-30%);
+  display: none;
+}
+.wave--v path { fill: var(--bg); }
+
+/* =========================================================
+   FORM SIDE (dark)
+   ========================================================= */
+.form-side {
+  position: relative;
+  background: var(--ink);
+  color: var(--bg);
+  padding: clamp(56px, 11vw, 76px) clamp(20px, 5vw, 40px) clamp(24px, 5vw, 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  overflow-y: auto;
+}
+.form-side::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255,77,0,.14), transparent 55%);
+  pointer-events: none;
+}
+
+.form {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vw, 18px);
+}
+
+/* =========================================================
+   FIELDS
+   ========================================================= */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.field__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(244,241,232,.5);
+  padding-left: 6px;
+}
+.field__wrap {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 999px;
+  min-height: 60px;
+  padding: 0 22px;
+  transition: border-color .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
+}
+.field__wrap:focus-within {
+  border-color: rgba(255,77,0,.55);
+  background: rgba(255,77,0,.04);
+  box-shadow: 0 0 0 4px rgba(255,77,0,.1);
+}
+.field__wrap.error {
+  border-color: rgba(255,77,0,.7);
+  background: rgba(255,77,0,.06);
+}
+
+.field__icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-right: 12px;
+  color: rgba(244,241,232,.4);
+  transition: color .2s var(--ease);
+}
+.field__wrap:focus-within .field__icon { color: var(--accent); }
+.field__icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.field__prefix {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(244,241,232,.75);
+  margin-right: 8px;
+  flex-shrink: 0;
+  letter-spacing: .02em;
+}
+.field__input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: .08em;
+  padding: 16px 0;
+  border-radius: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: opacity .2s var(--ease);
+}
+.field__input--otp {
+  letter-spacing: .55em;
+  font-weight: 600;
+  font-size: 17px;
+  padding-left: 4px;
+}
+.field__input:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+.field__input::placeholder { color: rgba(244,241,232,.28); }
+.field__input--otp::placeholder {
+  letter-spacing: .35em;
+  font-weight: 400;
+  font-size: 15px;
+  opacity: .55;
+}
+.field__input:-webkit-autofill,
+.field__input:-webkit-autofill:hover,
+.field__input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--bg);
+  -webkit-box-shadow: 0 0 0 1000px var(--ink) inset;
+  transition: background-color 9999s ease-out;
+}
+
+/* Send code button — lives inside the OTP field */
+.field__action {
+  flex-shrink: 0;
+  margin-left: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,77,0,.45);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: transparent;
+  transition: background .18s var(--ease), color .18s var(--ease), border-color .18s var(--ease), opacity .18s var(--ease);
+  white-space: nowrap;
+  -webkit-user-select: none; user-select: none;
+}
+.field__action:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.field__action:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+.field__action.sent {
+  border-color: rgba(223,255,0,.5);
+  color: var(--signal);
+}
+.field__action.sent:hover:not(:disabled) {
+  background: var(--signal);
+  color: var(--ink);
+  border-color: var(--signal);
+}
+
+.field__error {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .04em;
+  color: var(--accent-2);
+  padding-left: 22px;
+  line-height: 1.5;
+}
+.field__error.show { display: block; }
+
+/* =========================================================
+   CTA
+   ========================================================= */
+.cta {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 60px;
+  border-radius: 999px;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 50%, var(--accent) 100%);
+  margin-top: 4px;
+  cursor: pointer;
+  transition: transform .2s var(--ease), opacity .2s var(--ease);
+  touch-action: manipulation;
+}
+.cta:hover:not(:disabled) { transform: translateY(-2px); }
+.cta:active:not(:disabled) { transform: translateY(0); }
+.cta:disabled { opacity: .55; cursor: not-allowed; }
+
+.cta__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  transition: background .25s var(--ease), color .25s var(--ease);
+}
+.cta:hover:not(:disabled) .cta__inner {
+  background: transparent;
+  color: #fff;
+}
+.cta__inner svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform .25s var(--ease);
+}
+.cta:hover:not(:disabled) .cta__inner svg { transform: translateX(3px); }
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(244,241,232,.25);
+  border-top-color: var(--bg);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* T&C */
+.tnc {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .04em;
+  text-align: center;
+  color: rgba(244,241,232,.4);
+  line-height: 1.7;
+  margin: 4px 0 0;
+}
+.tnc a {
+  color: rgba(244,241,232,.75);
+  border-bottom: 1px solid transparent;
+  transition: color .2s var(--ease), border-color .2s var(--ease);
+}
+.tnc a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Success */
+.success {
+  display: none;
+  text-align: center;
+  padding: 4px 0;
+}
+.success.show { display: block; animation: fadeIn .4s var(--ease-out); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.success__icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: var(--signal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: popIn .45s var(--ease-out);
+  color: var(--ink);
+}
+@keyframes popIn {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.success__icon svg {
+  width: 36px;
+  height: 36px;
+  stroke: currentColor;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.success__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--bg);
+  margin: 0 0 10px;
+}
+.success__desc {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: rgba(244,241,232,.55);
+  margin: 0;
+  letter-spacing: .04em;
+}
+
+/* =========================================================
+   DESKTOP — two-column split with vertical wave
+   ========================================================= */
+@media (min-width: 900px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: 1fr;
+  }
+
+  .brand {
+    padding: clamp(32px, 3.5vw, 48px) clamp(40px, 4vw, 64px) clamp(32px, 3.5vw, 48px);
+    gap: clamp(28px, 3.5vw, 48px);
+    justify-content: space-between;
+  }
+
+  .brand__hero {
+    text-align: left;
+    align-items: flex-start;
+    flex: 1;
+    justify-content: center;
+  }
+  .brand__eyebrow {
+    justify-content: flex-start;
+    padding-left: 0;
+  }
+  .brand__eyebrow::before { display: none; }
+  .brand__title { font-size: clamp(64px, 7vw, 96px); }
+  .brand__subtitle { font-size: 13px; }
+
+  .wave--h { display: none; }
+  .wave--v { display: block; }
+
+  .form-side {
+    padding: clamp(40px, 4vw, 64px);
+    overflow: hidden;
+  }
+  .form { max-width: 420px; }
+}
+
+/* Short viewports — tighten */
+@media (max-height: 720px) {
+  .brand__hero { gap: 8px; }
+  .brand__stats { padding-top: 14px; }
+  .field__wrap { min-height: 56px; }
+  .field__input { padding: 14px 0; }
+  .cta { min-height: 56px; }
+  .cta__inner { min-height: 52px; }
+}
+@media (max-height: 600px) and (min-width: 900px) {
+  .brand__title { font-size: clamp(48px, 5vw, 64px); }
+  .brand { gap: 18px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .brand { padding: 14px 22px 36px; gap: 10px; }
+  .brand__title { font-size: 34px; }
+  .brand__subtitle { display: none; }
+  .brand__stats { padding-top: 10px; }
+  .brand__stat strong { font-size: 15px; }
+  .brand__stat span { font-size: 8px; }
+  .wave--h { height: 36px; }
+  .form-side { padding: 34px 22px 20px; }
+  .field__wrap { min-height: 50px; padding: 0 18px; }
+  .field__input { padding: 12px 0; font-size: 14px; }
+  .field__input--otp { font-size: 15px; }
+  .field__action { padding: 6px 10px; font-size: 9px; }
+  .cta { min-height: 50px; }
+  .cta__inner { min-height: 46px; font-size: 12px; }
+  .tnc { font-size: 9px; }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .brand { padding: 16px 18px 44px; gap: 14px; }
+  .brand__title { font-size: 38px; }
+  .logo__mark { width: 34px; height: 34px; border-radius: 10px; }
+  .logo__mark svg { width: 18px; height: 18px; }
+  .logo__text { font-size: 14px; }
+  .get-started { padding: 7px 10px; font-size: 9px; letter-spacing: .12em; }
+  .get-started svg { width: 12px; height: 12px; }
+  .form-side { padding: 48px 18px 22px; }
+  .field__wrap { min-height: 56px; padding: 0 14px; }
+  .field__icon { width: 18px; height: 18px; margin-right: 10px; }
+  .field__prefix { font-size: 13px; }
+  .field__input { font-size: 14px; letter-spacing: .04em; }
+  .field__input--otp { font-size: 15px; letter-spacing: .4em; }
+  .field__action { padding: 6px 9px; font-size: 9px; letter-spacing: .06em; margin-left: 5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Logged-in overlay (shown for a split-second before redirect) -->
+<div id="loggedInFlash" style="display:none; position:fixed; inset:0; background:#0a0a0a; color:#F4F1E8; align-items:center; justify-content:center; flex-direction:column; gap:16px; z-index:9999; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase;">
+  <div style="width:40px; height:40px; border:2px solid rgba(244,241,232,.25); border-top-color:#FF4D00; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+  <div>Already signed in</div>
+</div>
+<style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
+<div class="app">
+
+  <!-- ============ BRAND (cream) ============ -->
+  <aside class="brand">
+
+    <header class="brand__top">
+      <a class="logo" href="/" aria-label="SMS Adda">
+        <span class="logo__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9-9-4-9-9zm4.5 0a4.5 4.5 0 0 0 9 0 4.5 4.5 0 0 0-9 0z"/>
+          </svg>
+        </span>
+        <span class="logo__text">SMS<em>ADDA</em></span>
+      </a>
+
+      <a class="get-started" href="/get-started.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+        Get Started
+      </a>
+    </header>
+
+    <div class="brand__hero">
+      <span class="brand__eyebrow">Nepal · SMS · Adda</span>
+      <h1 class="brand__title">Sign In</h1>
+      <p class="brand__subtitle">Enter your number to receive a code.</p>
+    </div>
+
+    <div class="brand__stats">
+      <div class="brand__stat">
+        <strong>+977</strong>
+        <span>Nepal</span>
+      </div>
+      <div class="brand__stat">
+        <strong><em>6</em></strong>
+        <span>Gateways</span>
+      </div>
+      <div class="brand__stat">
+        <strong>&lt;5s</strong>
+        <span>Delivery</span>
+      </div>
+    </div>
+
+    <svg class="wave wave--h" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M 0 0 L 1000 0 L 1000 45 Q 750 100 500 45 Q 250 0 0 45 Z"/>
+    </svg>
+
+    <svg class="wave wave--v" viewBox="0 0 100 1000" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M 0 0 L 50 0 Q 85 250 50 500 Q 15 750 50 1000 L 0 1000 Z"/>
+    </svg>
+
+  </aside>
+
+  <!-- ============ FORM (dark) ============ -->
+  <section class="form-side">
+
+    <form class="form" id="signinForm" novalidate autocomplete="on">
+
+      <!-- Phone -->
+      <div class="field">
+        <label class="field__label" for="phone">Phone number</label>
+        <div class="field__wrap" id="phoneWrap">
+          <span class="field__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="5" y="2" width="14" height="20" rx="2"/>
+              <line x1="12" y1="18" x2="12.01" y2="18"/>
+            </svg>
+          </span>
+          <span class="field__prefix" aria-hidden="true">+977</span>
+          <input
+            type="tel"
+            id="phone"
+            class="field__input"
+            placeholder="98XXXXXXXX"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            autocomplete="tel-national"
+            maxlength="10"
+            enterkeyhint="next"
+            required
+          />
+        </div>
+        <p class="field__error" id="phoneError">Enter a valid 10-digit number starting with 98 or 97</p>
+      </div>
+
+      <!-- OTP — with the Send code button inside -->
+      <div class="field">
+        <label class="field__label" for="otp">Verification code</label>
+        <div class="field__wrap" id="otpWrap">
+          <span class="field__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="10" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </span>
+          <input
+            type="tel"
+            id="otp"
+            class="field__input field__input--otp"
+            placeholder="000000"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            autocomplete="one-time-code"
+            maxlength="6"
+            enterkeyhint="go"
+            disabled
+            required
+          />
+          <button type="button" class="field__action" id="sendCodeBtn">Send code</button>
+        </div>
+        <p class="field__error" id="otpError">Enter the 6-digit code we sent you</p>
+      </div>
+
+      <!-- CTA -->
+      <button type="submit" class="cta" id="submitBtn">
+        <span class="cta__inner" id="ctaInner">
+          <span>Verify &amp; Sign In</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </span>
+      </button>
+
+      <p class="tnc">
+        By continuing, you agree to our
+        <a href="/terms.html" target="_blank" rel="noopener">Terms</a> &amp;
+        <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.
+      </p>
+
+    </form>
+
+    <!-- Success state -->
+    <div class="success" id="successState">
+      <div class="success__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2 class="success__title">You're in.</h2>
+      <p class="success__desc">Opening SMS Adda…</p>
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =========================================================
+     EARLY EXIT — already signed in?
+     ========================================================= */
+  (function checkExistingSession() {
+    try {
+      var raw = localStorage.getItem("smsadda_user");
+      if (!raw) return;
+      var u = JSON.parse(raw);
+      if (!u || !u.phone) return;
+
+      // Session valid for 30 days
+      var signedAt = u.signedInAt ? new Date(u.signedInAt).getTime() : 0;
+      var THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+
+      if (Date.now() - signedAt < THIRTY_DAYS) {
+        // Show a quick flash so it doesn't feel like a broken page
+        var flash = document.getElementById("loggedInFlash");
+        if (flash) flash.style.display = "flex";
+
+        // Redirect immediately (use replace so back button doesn't return here)
+        window.location.replace("/app.html");
+      } else {
+        // Expired — clean it up so the form shows normally
+        try { localStorage.removeItem("smsadda_user"); } catch (e) {}
+      }
+    } catch (e) {
+      // Malformed data — ignore and show the form
+    }
+  })();
+
+  /* =========================================================
+     CONFIG
+     ========================================================= */
+  var WORKER_URL = "https://smsbomber.ethical-laxman.workers.dev/";
+
+  /* =========================================================
+     DOM
+     ========================================================= */
+  var form         = document.getElementById("signinForm");
+  var phoneInput   = document.getElementById("phone");
+  var phoneWrap    = document.getElementById("phoneWrap");
+  var phoneError   = document.getElementById("phoneError");
+
+  var otpInput     = document.getElementById("otp");
+  var otpWrap      = document.getElementById("otpWrap");
+  var otpError     = document.getElementById("otpError");
+  var sendCodeBtn  = document.getElementById("sendCodeBtn");
+
+  var submitBtn    = document.getElementById("submitBtn");
+  var ctaInner     = document.getElementById("ctaInner");
+  var successState = document.getElementById("successState");
+
+  /* =========================================================
+     STATE
+     ========================================================= */
+  var isSendingCode = false;
+  var isSubmitting  = false;
+  var codeSent      = false;
+  var resendTimer   = null;
+  var lastPhone     = "";   // the phone number the current OTP was sent to
+
+  /* =========================================================
+     VALIDATION
+     ========================================================= */
+  function isValidNepaliPhone(v) { return /^(98|97)\d{8}$/.test(v); }
+  function isValidOtp(v)         { return /^\d{6}$/.test(v); }
+
+  function validatePhone(showError) {
+    var ok = isValidNepaliPhone(phoneInput.value.replace(/\D/g, ""));
+    if (showError !== false) {
+      phoneWrap.classList.toggle("error", !ok);
+      phoneError.classList.toggle("show", !ok);
+    }
+    return ok;
+  }
+  function validateOtp(showError) {
+    var ok = isValidOtp(otpInput.value.replace(/\D/g, ""));
+    if (showError !== false) {
+      otpWrap.classList.toggle("error", !ok);
+      otpError.classList.toggle("show", !ok);
+    }
+    return ok;
+  }
+
+  /* =========================================================
+     PHONE INPUT
+     ========================================================= */
+  phoneInput.addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, "").slice(0, 10);
+    if (this.value.length === 10) validatePhone(false);
+    else { phoneWrap.classList.remove("error"); phoneError.classList.remove("show"); }
+
+    // If the user edits the phone after a code was sent, invalidate it
+    var current = this.value.replace(/\D/g, "");
+    if (codeSent && current !== lastPhone) {
+      resetCodeState();
+    }
+  });
+  phoneInput.addEventListener("keydown", function (e) {
+    if (["e","E","+","-",".",","].indexOf(e.key) !== -1) e.preventDefault();
+    if (e.key === "Enter") { e.preventDefault(); otpInput.focus(); }
+  });
+
+  /* =========================================================
+     OTP INPUT
+     ========================================================= */
+  otpInput.addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, "").slice(0, 6);
+    if (this.value.length === 6) validateOtp(false);
+    else { otpWrap.classList.remove("error"); otpError.classList.remove("show"); }
+
+    // Auto-submit when 6 digits typed
+    if (this.value.length === 6) {
+      setTimeout(function () {
+        if (otpInput.value.replace(/\D/g, "").length === 6) {
+          if (typeof form.requestSubmit === "function") form.requestSubmit();
+          else submitBtn.click();
+        }
+      }, 250);
+    }
+  });
+  otpInput.addEventListener("keydown", function (e) {
+    if (["e","E","+","-",".",","].indexOf(e.key) !== -1) e.preventDefault();
+  });
+
+  /* =========================================================
+     SEND CODE
+     ========================================================= */
+  function sendCode() {
+    if (isSendingCode) return;
+    if (!validatePhone(true)) { phoneInput.focus(); return; }
+
+    isSendingCode = true;
+    sendCodeBtn.disabled = true;
+    sendCodeBtn.textContent = "Sending…";
+
+    var phone = phoneInput.value.replace(/\D/g, "");
+
+    fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: phone, gateway: "auto" })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      isSendingCode = false;
+      if (data.ok) {
+        codeSent  = true;
+        lastPhone = phone;
+        enableOtpField();
+        startResendTimer();
+      } else {
+        sendCodeBtn.disabled = false;
+        sendCodeBtn.textContent = "Send code";
+        showError(phoneError, phoneWrap, data.msg || "Could not send code. Try again.");
+      }
+    })
+    .catch(function (err) {
+      isSendingCode = false;
+      sendCodeBtn.disabled = false;
+      sendCodeBtn.textContent = "Send code";
+      showError(phoneError, phoneWrap, err.message || "Network error. Try again.");
+    });
+  }
+  sendCodeBtn.addEventListener("click", sendCode);
+
+  /* =========================================================
+     OTP ENABLE / RESET
+     ========================================================= */
+  function enableOtpField() {
+    otpInput.disabled = false;
+    sendCodeBtn.classList.add("sent");
+    setTimeout(function () { otpInput.focus(); }, 120);
+  }
+
+  function resetCodeState() {
+    codeSent = false;
+    lastPhone = "";
+    otpInput.value = "";
+    otpInput.disabled = true;
+    otpWrap.classList.remove("error");
+    otpError.classList.remove("show");
+    sendCodeBtn.classList.remove("sent");
+    sendCodeBtn.disabled = false;
+    sendCodeBtn.textContent = "Send code";
+    if (resendTimer) { clearInterval(resendTimer); resendTimer = null; }
+  }
+
+  /* =========================================================
+     RESEND TIMER
+     ========================================================= */
+  function startResendTimer() {
+    var seconds = 30;
+    sendCodeBtn.disabled = true;
+    sendCodeBtn.classList.remove("sent");
+    sendCodeBtn.textContent = "Resend " + seconds + "s";
+
+    if (resendTimer) clearInterval(resendTimer);
+    resendTimer = setInterval(function () {
+      seconds -= 1;
+      if (seconds <= 0) {
+        clearInterval(resendTimer);
+        resendTimer = null;
+        sendCodeBtn.disabled = false;
+        sendCodeBtn.classList.add("sent");
+        sendCodeBtn.textContent = "Resend";
+      } else {
+        sendCodeBtn.textContent = "Resend " + seconds + "s";
+      }
+    }, 1000);
+  }
+
+  /* =========================================================
+     SUBMIT
+     ========================================================= */
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    // If no code sent yet, kick off send instead
+    if (!codeSent) {
+      if (validatePhone(true)) sendCode();
+      return;
+    }
+
+    var okPhone = validatePhone(true);
+    var okOtp   = validateOtp(true);
+
+    if (!okPhone || !okOtp) {
+      if (!okPhone) phoneInput.focus();
+      else otpInput.focus();
+      return;
+    }
+
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    ctaInner.innerHTML = '<span class="spinner"></span><span>Verifying…</span>';
+
+    var phone = phoneInput.value.replace(/\D/g, "");
+
+    // Demo mode — accepts any 6-digit code.
+    // To wire real verification:
+    //   fetch('/api/verify-otp', { method:'POST', headers:{'Content-Type':'application/json'},
+    //     body: JSON.stringify({ phone, code: otpInput.value }) })
+    //   .then(r => r.json())
+    //   .then(data => data.ok ? onSuccess(phone) : onVerifyError(data.msg));
+    setTimeout(function () {
+      onSuccess(phone);
+    }, 900);
+  });
+
+  function onSuccess(phone) {
+    try {
+      localStorage.setItem("smsadda_user", JSON.stringify({
+        phone: "+977" + phone,
+        signedInAt: new Date().toISOString()
+      }));
+    } catch (err) {}
+
+    form.style.display = "none";
+    successState.classList.add("show");
+
+    setTimeout(function () {
+      window.location.href = "/app.html";
+    }, 1600);
+  }
+
+  /* =========================================================
+     ERROR DISPLAY
+     ========================================================= */
+  function showError(errEl, wrapEl, msg) {
+    errEl.textContent = (msg && msg.length < 70) ? msg : "Something went wrong. Try again.";
+    errEl.classList.add("show");
+    wrapEl.classList.add("error");
+
+    wrapEl.style.transition = "transform .08s ease";
+    wrapEl.style.transform = "translateX(-6px)";
+    setTimeout(function () { wrapEl.style.transform = "translateX(6px)"; }, 80);
+    setTimeout(function () { wrapEl.style.transform = "translateX(-4px)"; }, 160);
+    setTimeout(function () { wrapEl.style.transform = "translateX(0)"; }, 240);
+  }
+
+  /* =========================================================
+     iOS double-tap zoom safety
+     ========================================================= */
+  var lastTouch = 0;
+  document.addEventListener("touchend", function (e) {
+    var now = Date.now();
+    if (now - lastTouch < 350) {
+      var el = e.target && e.target.closest && e.target.closest("button, a");
+      if (el) e.preventDefault();
+    }
+    lastTouch = now;
+  }, { passive: false });
+
+})();
+</script>
+</body>
+</html>

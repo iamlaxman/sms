@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>404 — Page not found · SMS Adda</title>
+<meta name="description" content="The page you're looking for doesn't exist." />
+<meta name="author" content="Laxman Poudel" />
+<meta name="theme-color" content="#F4F1E8" />
+<meta name="robots" content="noindex, follow" />
+
+<link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
+<link rel="shortcut icon" href="/favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+<link rel="manifest" href="/favicon/site.webmanifest" />
+
+<style>
+:root {
+  --bg: #F4F1E8;
+  --bg-soft: #EDE8DC;
+  --ink: #111111;
+  --ink-soft: #333333;
+  --accent: #FF4D00;
+  --neutral: #E5E0D5;
+  --signal: #DFFF00;
+  --muted: #6b665c;
+  --line: #d8d2c4;
+  --border: 1px solid var(--ink);
+  --border-2: 2px solid var(--ink);
+  --gutter: clamp(16px, 4vw, 56px);
+  --nav-h: clamp(48px, 4.5vw, 58px);
+  --font-display: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --ease-out: cubic-bezier(.16,1,.3,1);
+  --shadow-offset: clamp(4px, 0.6vw, 8px);
+  --max: 1200px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(15px, 0.4vw + 13px, 17px);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh; min-height: 100svh; min-height: 100dvh;
+  display: flex; flex-direction: column;
+}
+img, svg { display: block; max-width: 100%; height: auto; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--accent); color: #fff; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.nav {
+  flex-shrink: 0;
+  background: rgba(244,241,232,.92);
+  backdrop-filter: saturate(150%) blur(14px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
+  border-bottom: var(--border);
+  padding-top: env(safe-area-inset-top, 0px);
+  position: relative; z-index: 10;
+}
+.nav__inner {
+  max-width: var(--max); margin-inline: auto; padding: 0 var(--gutter);
+  height: var(--nav-h); display: flex; align-items: center; gap: 10px;
+}
+.nav__brand {
+  font-weight: 700; font-size: clamp(15px, 0.5vw + 13px, 19px);
+  letter-spacing: -0.01em; flex-shrink: 0;
+}
+.nav__brand-accent { color: var(--accent); margin-left: 2px; }
+.nav__links {
+  margin-left: auto; display: flex; align-items: center; gap: 4px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+}
+.nav__link {
+  padding: 8px 12px; border: 1px solid transparent;
+  transition: border-color .2s var(--ease);
+  display: inline-flex; align-items: center; min-height: 36px;
+}
+.nav__link:hover { border-color: var(--ink); }
+.nav__link--cta {
+  border: var(--border); background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.nav__link--cta:hover { background: var(--ink); border-color: var(--ink); }
+@media (max-width: 520px) { .nav__link:not(.nav__link--cta) { display: none; } }
+
+.main {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(24px, 4vw, 64px) var(--gutter);
+  position: relative; overflow: hidden;
+}
+.main::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(17,17,17,.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17,17,17,.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%);
+  animation: gridDrift 24s linear infinite;
+  pointer-events: none;
+}
+@keyframes gridDrift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 64px 64px, 64px 64px; }
+}
+
+.card {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 640px;
+  border: var(--border-2);
+  background: var(--bg);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--ink);
+  padding: clamp(28px, 4vw, 56px);
+}
+.tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: clamp(16px, 2vw, 24px);
+}
+.tag::before { content: ""; width: 28px; height: 1px; background: var(--accent); }
+.code {
+  font-weight: 700;
+  font-size: clamp(72px, 16vw, 180px);
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  margin: 0 0 clamp(12px, 2vw, 20px);
+  background: linear-gradient(180deg, var(--ink) 60%, var(--accent) 60%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.title {
+  font-weight: 700;
+  font-size: clamp(22px, 2.4vw + 14px, 38px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  margin: 0 0 clamp(12px, 1.5vw, 18px);
+}
+.desc {
+  font-size: clamp(14px, 0.4vw + 13px, 17px);
+  color: var(--ink-soft);
+  margin: 0 0 clamp(20px, 3vw, 32px);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: clamp(24px, 3vw, 36px); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 22px; min-height: 48px;
+  border: var(--border-2);
+  font-family: var(--font-mono); font-size: clamp(11px, 0.5vw + 10px, 13px);
+  font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  background: var(--accent); color: #fff; border-color: var(--accent);
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--ink);
+  background: var(--ink); border-color: var(--ink); color: var(--bg);
+}
+.btn--ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn--ghost:hover {
+  background: var(--ink); color: var(--bg);
+  box-shadow: 4px 4px 0 var(--accent);
+}
+.btn::after { content: "↗"; font-size: 1em; transition: transform .25s var(--ease); }
+.btn:hover::after { transform: translate(2px, -2px); }
+
+.divider {
+  border-top: var(--border); padding-top: clamp(16px, 2vw, 24px);
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+}
+.divider__label {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted);
+}
+.divider__links {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+}
+.divider__link {
+  color: var(--muted);
+  border-bottom: 1px solid transparent;
+  padding: 2px 0;
+  transition: color .2s var(--ease), border-color .2s var(--ease);
+}
+.divider__link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  .main::before { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="/index.html">SMS<span class="nav__brand-accent">ADDA</span></a>
+    <nav class="nav__links">
+      <a class="nav__link" href="/about.html">About</a>
+      <a class="nav__link" href="/terms.html">Terms</a>
+      <a class="nav__link" href="/privacy.html">Privacy</a>
+      <a class="nav__link nav__link--cta" href="/login.html">Sign in</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main">
+  <div class="card">
+    <span class="tag">Error · 404</span>
+    <h1 class="code">404</h1>
+    <h2 class="title">Page not found.</h2>
+    <p class="desc">
+      The page you're looking for doesn't exist, was moved, or the URL was typed incorrectly. Nothing is broken on your end.
+    </p>
+
+    <div class="actions">
+      <a class="btn" href="/index.html">Back to home</a>
+      <a class="btn btn--ghost" href="/login.html">Sign in</a>
+    </div>
+
+    <div class="divider">
+      <span class="divider__label">Try one of these</span>
+      <div class="divider__links">
+        <a class="divider__link" href="/about.html">About</a>
+        <a class="divider__link" href="/terms.html">Terms</a>
+        <a class="divider__link" href="/privacy.html">Privacy</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

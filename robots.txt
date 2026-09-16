@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Don't index private pages
+Disallow: /login
+Disallow: /app
+Disallow: /404
+Disallow: /offline
+
+Sitemap: https://smsadda.vercel.app/sitemap.xml

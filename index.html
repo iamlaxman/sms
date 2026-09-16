@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SMS Adda — A security research playground, built in Nepal.</title>
+<meta name="description" content="SMS Adda is a security research playground that maps vulnerabilities across Nepal's SMS infrastructure. Educational purposes only. Not responsible for misuse." />
+<meta name="author" content="Laxman Poudel" />
+<meta name="theme-color" content="#F4F1E8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="SMS Adda" />
+<meta name="format-detection" content="telephone=no" />
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://smsadda.vercel.app/" />
+<meta property="og:title" content="SMS Adda — Security research playground, built in Nepal." />
+<meta property="og:description" content="Mapping vulnerabilities across Nepal's SMS infrastructure. Educational purposes only." />
+<meta property="og:image" content="https://smsadda.vercel.app/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="SMS Adda" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content="https://smsadda.vercel.app/" />
+<meta name="twitter:title" content="SMS Adda — Security research playground, built in Nepal." />
+<meta name="twitter:description" content="Mapping vulnerabilities across Nepal's SMS infrastructure." />
+<meta name="twitter:image" content="https://smsadda.vercel.app/og-image.png" />
+
+<link rel="canonical" href="https://smsadda.vercel.app/" />
+<link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
+<link rel="shortcut icon" href="/favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+<link rel="manifest" href="/favicon/site.webmanifest" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "SMS Adda",
+  "url": "https://smsadda.vercel.app/",
+  "description": "A security research playground that maps vulnerabilities across Nepal's SMS infrastructure.",
+  "inLanguage": "en",
+  "publisher": { "@type": "Organization", "name": "SMS Adda", "url": "https://smsadda.vercel.app/" }
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+:root {
+  --bg:      #F4F1E8;
+  --ink:     #111111;
+  --accent:  #FF4D00;
+  --neutral: #E5E0D5;
+  --signal:  #DFFF00;
+  --muted:   #6b665c;
+
+  --border:   1px solid var(--ink);
+  --border-2: 2px solid var(--ink);
+
+  --s-1: 8px;  --s-2: 16px; --s-3: 24px; --s-4: 32px;
+  --s-5: 48px; --s-6: 64px; --s-7: 96px; --s-8: 128px;
+
+  --max: 1440px;
+  --gutter: clamp(16px, 4.5vw, 72px);
+  --nav-h: 58px;
+
+  --font-display: "Space Grotesk", "Archivo", system-ui, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --ease-out: cubic-bezier(.16,1,.3,1);
+}
+
+/* =========================================================
+   RESET + GLOBAL MOBILE TAP-HIGHLIGHT FIX
+   ========================================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+}
+html, body { margin: 0; padding: 0; }
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 8px);
+}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.1vw, 17px);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+  text-rendering: optimizeLegibility;
+}
+body.no-scroll { overflow: hidden; }
+img, svg { display: block; max-width: 100%; height: auto; }
+
+/* Kill outlines on mouse/touch, keep for keyboard */
+a:focus, button:focus { outline: none; }
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+button {
+  font: inherit; color: inherit; background: none; border: 0; cursor: pointer;
+  -webkit-user-select: none; user-select: none;
+}
+a {
+  color: inherit; text-decoration: none;
+  -webkit-user-select: none; user-select: none;
+}
+::selection { background: var(--accent); color: #fff; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0;
+  background: var(--ink); color: var(--bg);
+  padding: var(--s-1) var(--s-2); z-index: 400;
+}
+.skip-link:focus { left: var(--s-2); top: var(--s-2); }
+
+.wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); width: 100%; }
+.u-accent { color: var(--accent); }
+
+.eyebrow, .section-tag {
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 1vw, 12px);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.eyebrow { display: flex; gap: var(--s-1); flex-wrap: wrap; color: var(--ink); }
+.eyebrow__dot { color: var(--accent); }
+.section-tag {
+  display: inline-block;
+  border: var(--border);
+  padding: 4px 8px;
+  margin-bottom: var(--s-5);
+  color: var(--ink);
+  background: var(--bg);
+}
+.section-tag--light { color: var(--bg); border-color: var(--bg); background: transparent; }
+
+/* scroll progress */
+.scroll-bar {
+  position: fixed; top: 0; left: 0;
+  height: 2px; width: 0%;
+  background: var(--accent);
+  z-index: 250;
+  transition: width .08s linear;
+  will-change: width;
+}
+
+/* buttons */
+.btn {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: clamp(10px, 1.2vw, 13px) clamp(16px, 2vw, 22px);
+  border: var(--border-2);
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1vw, 13px);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: var(--bg); color: var(--ink);
+  border-radius: 0;
+  overflow: hidden;
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), color .2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.btn > span { position: relative; z-index: 1; }
+.btn::before {
+  content: ""; position: absolute; inset: 0;
+  background: var(--ink);
+  transform: translateY(101%);
+  transition: transform .35s var(--ease-out);
+  z-index: 0;
+}
+.btn:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--ink); color: var(--bg); }
+.btn:hover::before { transform: translateY(0); }
+.btn:active { transform: translate(0,0); box-shadow: 0 0 0 var(--ink); }
+.btn--primary { background: var(--accent); color: #fff; border-color: var(--ink); }
+.btn--primary::before { background: var(--ink); }
+.btn--ghost { background: transparent; }
+.btn--cta { padding: 8px 14px; font-size: 12px; }
+.btn--xl { padding: clamp(14px, 2vw, 20px) clamp(20px, 3vw, 28px); font-size: clamp(13px, 1.1vw, 15px); }
+
+/* On touch: no hover stickiness */
+@media (hover: none) {
+  .btn:hover { transform: none; box-shadow: 0 0 0 var(--ink); color: var(--ink); }
+  .btn--primary:hover { color: #fff; }
+  .btn:hover::before { transform: translateY(101%); }
+  .btn--primary:hover::before { transform: translateY(101%); }
+  .btn:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--ink); }
+}
+
+/* =========================================================
+   NAV
+   ========================================================= */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(244,241,232,.86);
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: var(--border);
+  transition: transform .35s var(--ease);
+  height: var(--nav-h);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.nav.is-hidden { transform: translateY(-100%); }
+.nav__inner {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: 0 var(--gutter);
+  display: flex; align-items: center; gap: var(--s-4);
+  height: 100%;
+}
+.nav__brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(16px, 1.4vw, 18px);
+  position: relative; z-index: 210;
+  flex-shrink: 0;
+}
+.nav__brand-accent { color: var(--accent); margin-left: 2px; }
+.nav__links {
+  margin-left: auto;
+  display: flex; gap: var(--s-4);
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.nav__links a { position: relative; padding: 4px 0; }
+.nav__links a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+  height: 2px; background: var(--accent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .25s var(--ease);
+}
+.nav__links a:hover::after { transform: scaleX(1); }
+.nav__toggle {
+  display: none; margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: .14em;
+  text-transform: uppercase;
+  border: var(--border); padding: 6px 10px;
+  position: relative; z-index: 210;
+  background: transparent;
+  transition: color .3s var(--ease), border-color .3s var(--ease), background .3s var(--ease);
+  min-height: 36px;
+}
+body.menu-open .nav { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom-color: transparent; }
+body.menu-open .nav__brand,
+body.menu-open .nav__toggle { color: var(--bg); border-color: var(--bg); }
+
+@media (max-width: 900px) {
+  .nav__links, .nav__cta { display: none; }
+  .nav__toggle { display: inline-flex; align-items: center; }
+}
+
+/* =========================================================
+   MENU
+   ========================================================= */
+.menu {
+  position: fixed; inset: 0;
+  background: var(--ink); color: var(--bg);
+  z-index: 190;
+  display: flex; flex-direction: column;
+  padding: calc(var(--nav-h) + env(safe-area-inset-top, 0px) + var(--s-5)) var(--gutter) calc(var(--s-5) + env(safe-area-inset-bottom, 0px));
+  clip-path: circle(0% at calc(100% - 44px) calc(var(--nav-h) / 2));
+  transition: clip-path .6s var(--ease-out);
+  pointer-events: none; visibility: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.menu.is-open {
+  clip-path: circle(150% at calc(100% - 44px) calc(var(--nav-h) / 2));
+  pointer-events: auto; visibility: visible;
+}
+.menu__nav { display: flex; flex-direction: column; border-top: 1px solid rgba(244,241,232,.18); margin-top: var(--s-3); }
+.menu__link {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: clamp(16px, 2.2vw, 26px) 0;
+  border-bottom: 1px solid rgba(244,241,232,.18);
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(26px, 7vw, 48px);
+  letter-spacing: -0.02em; text-transform: uppercase;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .5s var(--ease-out), transform .5s var(--ease-out), color .2s var(--ease);
+  line-height: 1;
+}
+.menu__link small {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .18em; color: var(--accent);
+  flex-shrink: 0; margin-left: 12px;
+}
+.menu__link:hover { color: var(--accent); }
+.menu.is-open .menu__link { opacity: 1; transform: none; }
+.menu.is-open .menu__link:nth-child(1) { transition-delay: .12s; }
+.menu.is-open .menu__link:nth-child(2) { transition-delay: .18s; }
+.menu.is-open .menu__link:nth-child(3) { transition-delay: .24s; }
+.menu.is-open .menu__link:nth-child(4) { transition-delay: .30s; }
+.menu.is-open .menu__link:nth-child(5) { transition-delay: .36s; }
+.menu__foot {
+  margin-top: auto; padding-top: var(--s-5);
+  display: flex; flex-wrap: wrap; gap: var(--s-3);
+  align-items: center; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: rgba(244,241,232,.6);
+}
+.menu__cta { border-color: var(--bg); color: var(--bg); background: transparent; }
+.menu__cta::before { background: var(--bg); }
+.menu__cta:hover { color: var(--ink); }
+
+/* =========================================================
+   HERO — TRUE FULL SCREEN ON EVERY DEVICE
+   ========================================================= */
+.hero {
+  position: relative;
+  /* Three-layer fallback for perfect viewport fill */
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  padding:
+    calc(var(--nav-h) + env(safe-area-inset-top, 0px) + clamp(24px, 4vw, 64px))
+    0
+    calc(clamp(24px, 4vw, 64px) + env(safe-area-inset-bottom, 0px));
+  border-bottom: var(--border);
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.hero::before {
+  content: "";
+  position: absolute; inset: -1px;
+  background-image:
+    linear-gradient(to right, rgba(17,17,17,.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17,17,17,.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at 70% 40%, #000 40%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse at 70% 40%, #000 40%, transparent 78%);
+  animation: gridDrift 24s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes gridDrift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 64px 64px, 64px 64px; }
+}
+.hero__grid {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max);
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(24px, 5vw, 96px);
+  align-items: center;
+}
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(44px, 11vw, 168px);
+  line-height: .88;
+  letter-spacing: -0.04em;
+  margin: var(--s-4) 0;
+  display: flex; flex-direction: column;
+  text-transform: uppercase;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.hero__title > span {
+  display: block; opacity: 0; transform: translateY(38px);
+  transition: opacity .9s var(--ease-out), transform .9s var(--ease-out);
+}
+.hero__title > span:nth-child(1) { transition-delay: .05s; }
+.hero__title > span:nth-child(2) { transition-delay: .16s; }
+.hero__title > span:nth-child(3) { transition-delay: .27s; }
+.hero.is-ready .hero__title > span { opacity: 1; transform: none; }
+.hero__title-accent { color: var(--accent); }
+.hero__copy {
+  max-width: 48ch;
+  font-size: clamp(15px, 1.3vw, 19px);
+  color: #232323;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .8s var(--ease-out) .38s, transform .8s var(--ease-out) .38s;
+}
+.hero__actions {
+  display: flex; flex-wrap: wrap; gap: var(--s-2);
+  margin-top: var(--s-4);
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .8s var(--ease-out) .5s, transform .8s var(--ease-out) .5s;
+}
+.hero__meta {
+  display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-4);
+  margin-top: var(--s-5);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted);
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .8s var(--ease-out) .62s, transform .8s var(--ease-out) .62s;
+}
+.hero.is-ready .hero__copy,
+.hero.is-ready .hero__actions,
+.hero.is-ready .hero__meta { opacity: 1; transform: none; }
+.hero__left .eyebrow {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .8s var(--ease-out), transform .8s var(--ease-out);
+}
+.hero.is-ready .hero__left .eyebrow { opacity: 1; transform: none; }
+.hero__right {
+  position: relative;
+  opacity: 0; transform: translateY(28px) rotate(-.4deg);
+  transition: opacity 1s var(--ease-out) .3s, transform 1s var(--ease-out) .3s;
+}
+.hero.is-ready .hero__right { opacity: 1; transform: none; }
+
+.panel {
+  position: relative;
+  border: var(--border-2);
+  background: var(--bg);
+  box-shadow: 8px 8px 0 var(--ink);
+  overflow: hidden;
+}
+.panel::after {
+  content: ""; position: absolute; top: 0; left: -60%; width: 60%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,77,0,.14), transparent);
+  transform: skewX(-14deg);
+  animation: sheen 7s var(--ease) infinite;
+  pointer-events: none;
+}
+@keyframes sheen { 0%,55% { left: -70%; } 75% { left: 130%; } 100% { left: 130%; } }
+.panel__head, .panel__foot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em;
+  text-transform: uppercase; border-bottom: var(--border);
+  gap: 8px;
+}
+.panel__head-meta { color: var(--accent); }
+.panel__foot { border-bottom: 0; border-top: var(--border); color: var(--muted); }
+.panel__foot-mark { color: var(--accent); }
+.panel__body { padding: var(--s-4) var(--s-4) var(--s-3); }
+.panel__label {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 4px;
+}
+.panel__label--mt { margin-top: var(--s-4); }
+.panel__big {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(52px, 7vw, 96px); line-height: .9; letter-spacing: -0.03em; margin: 0;
+}
+.panel__sub {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--accent); margin: 4px 0 0;
+}
+.panel__bars { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-top: var(--s-2); }
+.panel__bars span {
+  height: 14px; background: var(--ink);
+  transform-origin: bottom;
+  animation: barPulse 2.4s var(--ease) infinite;
+}
+.panel__bars span:nth-child(3n) { background: var(--accent); }
+.panel__bars span:nth-child(1) { animation-delay: .0s; }
+.panel__bars span:nth-child(2) { animation-delay: .1s; }
+.panel__bars span:nth-child(3) { animation-delay: .2s; }
+.panel__bars span:nth-child(4) { animation-delay: .3s; }
+.panel__bars span:nth-child(5) { animation-delay: .4s; }
+.panel__bars span:nth-child(6) { animation-delay: .5s; }
+.panel__bars span:nth-child(7) { animation-delay: .6s; }
+.panel__bars span:nth-child(8) { animation-delay: .7s; }
+.panel__bars span:nth-child(9) { animation-delay: .8s; }
+.panel__bars span:nth-child(10){ animation-delay: .9s; }
+@keyframes barPulse { 0%,100% { transform: scaleY(.5); opacity: .55; } 50% { transform: scaleY(1); opacity: 1; } }
+.panel__rows { list-style: none; padding: 0; margin: var(--s-4) 0 0; border-top: var(--border); }
+.panel__rows li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: var(--border);
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.panel__rows li b { margin-left: auto; font-weight: 600; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; position: relative; }
+.dot--on { background: var(--accent); }
+.dot--on::after {
+  content: ""; position: absolute; inset: -4px;
+  border-radius: 50%; border: 1px solid var(--accent);
+  animation: ping 2s var(--ease) infinite;
+}
+.dot--warn { background: var(--ink); }
+@keyframes ping { 0% { transform: scale(.6); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+
+.anno {
+  position: absolute; font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink);
+}
+.anno--cross { top: -14px; right: -14px; color: var(--accent); font-size: 18px; animation: spin 12s linear infinite; }
+.anno--coord { bottom: -22px; left: 0; color: var(--muted); animation: floaty 6s var(--ease) infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+/* Tablet */
+@media (max-width: 900px) {
+  .hero { padding-top: calc(var(--nav-h) + var(--s-5)); padding-bottom: var(--s-5); }
+  .hero__grid { grid-template-columns: 1fr; gap: var(--s-5); }
+  .panel { box-shadow: 6px 6px 0 var(--ink); }
+  .hero__title { margin: var(--s-3) 0; }
+}
+
+/* Mobile — hide panel, center content, truly fill screen */
+@media (max-width: 720px) {
+  .hero {
+    padding:
+      calc(var(--nav-h) + env(safe-area-inset-top, 0px) + var(--s-4))
+      0
+      calc(var(--s-5) + env(safe-area-inset-bottom, 0px));
+    align-items: stretch;
+  }
+  .hero__grid {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    grid-template-columns: 1fr;
+    gap: 0;
+    min-height: 100%;
+    padding-inline: var(--gutter);
+  }
+  .hero__right { display: none; }
+  .hero__title { font-size: clamp(48px, 15vw, 96px); margin: var(--s-3) 0; }
+  .hero__copy { font-size: 15px; }
+  .hero__actions { gap: 8px; }
+  .hero__actions .btn { flex: 1 1 auto; justify-content: center; }
+  .hero__meta { gap: 6px 14px; font-size: 10px; margin-top: var(--s-4); }
+}
+
+@media (max-width: 400px) {
+  .hero__title { font-size: clamp(42px, 16vw, 72px); }
+  .hero__actions .btn { flex: 1 1 100%; }
+}
+
+/* =========================================================
+   TICKER
+   ========================================================= */
+.ticker {
+  border-bottom: var(--border); background: var(--ink); color: var(--bg);
+  overflow: hidden; padding: 12px 0;
+}
+.ticker--reverse { background: var(--accent); color: #fff; border-top: var(--border); border-bottom: var(--border); }
+.ticker__track {
+  display: inline-flex; gap: var(--s-4); white-space: nowrap;
+  font-family: var(--font-mono); font-size: clamp(10px, .95vw, 12px);
+  letter-spacing: .22em; text-transform: uppercase;
+  animation: ticker 40s linear infinite;
+  padding-left: var(--s-4); will-change: transform;
+}
+.ticker--reverse .ticker__track { animation-direction: reverse; }
+.ticker:hover .ticker__track { animation-play-state: paused; }
+.ticker__sep { opacity: .6; }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* =========================================================
+   REVEAL
+   ========================================================= */
+.reveal {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity .85s var(--ease-out), transform .85s var(--ease-out);
+  transition-delay: var(--d, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-in { opacity: 1; transform: none; }
+
+/* =========================================================
+   PURPOSE
+   ========================================================= */
+.purpose {
+  padding: clamp(56px, 8vw, 128px) 0;
+  border-bottom: var(--border);
+  background: linear-gradient(180deg, var(--bg) 0%, var(--neutral) 100%);
+}
+.purpose__title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(32px, 6.5vw, 92px);
+  line-height: .95; letter-spacing: -0.035em;
+  text-transform: uppercase;
+  margin: 0 0 var(--s-4);
+  display: flex; flex-direction: column;
+}
+.purpose__lead {
+  max-width: 62ch;
+  font-size: clamp(15px, 1.3vw, 19px);
+  color: #232323;
+  margin: 0 0 var(--s-5);
+}
+.purpose__lead strong { color: var(--accent); font-weight: 700; }
+.purpose__cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: var(--border-2);
+  background: var(--bg);
+  margin-top: var(--s-5);
+}
+.purpose__card {
+  padding: clamp(20px, 3vw, 32px);
+  border-right: var(--border-2);
+  display: flex; flex-direction: column;
+  gap: var(--s-2);
+  transition: background .25s var(--ease);
+}
+.purpose__card:last-child { border-right: 0; }
+.purpose__card:hover { background: var(--neutral); }
+.purpose__card-num {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .18em;
+  color: var(--accent);
+}
+.purpose__card h4 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(18px, 1.8vw, 26px);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.purpose__card p {
+  font-size: clamp(13px, 1.1vw, 15px);
+  color: #333; margin: 0; line-height: 1.5;
+}
+@media (max-width: 780px) {
+  .purpose__cards { grid-template-columns: 1fr; }
+  .purpose__card { border-right: 0; border-bottom: var(--border-2); }
+  .purpose__card:last-child { border-bottom: 0; }
+}
+
+/* =========================================================
+   GATEWAYS
+   ========================================================= */
+.gateways {
+  padding: clamp(56px, 8vw, 128px) 0;
+  border-bottom: var(--border);
+  background: var(--ink); color: var(--bg);
+  position: relative; overflow: hidden;
+}
+.gateways::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 20% 20%, rgba(255,77,0,.12), transparent 45%),
+                    radial-gradient(circle at 80% 80%, rgba(223,255,0,.06), transparent 45%);
+  pointer-events: none;
+}
+.gateways__inner { position: relative; }
+.gateways__title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(30px, 6vw, 80px);
+  line-height: .95; letter-spacing: -0.03em;
+  text-transform: uppercase;
+  margin: 0 0 var(--s-3);
+  display: flex; flex-direction: column;
+}
+.gateways__lead {
+  max-width: 62ch;
+  font-size: clamp(14px, 1.2vw, 17px);
+  color: rgba(244,241,232,.75);
+  margin: 0 0 var(--s-6);
+}
+.gateways__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid rgba(244,241,232,.18);
+  border-left: 1px solid rgba(244,241,232,.18);
+}
+.gateway {
+  padding: clamp(20px, 3vw, 32px);
+  border-right: 1px solid rgba(244,241,232,.18);
+  border-bottom: 1px solid rgba(244,241,232,.18);
+  display: flex; flex-direction: column; gap: 10px;
+  transition: background .25s var(--ease);
+  position: relative;
+}
+.gateway:hover { background: rgba(244,241,232,.04); }
+.gateway__num { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; color: var(--accent); }
+.gateway__name {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(20px, 2.2vw, 34px);
+  letter-spacing: -0.02em; text-transform: uppercase;
+  color: var(--bg); margin: 0;
+}
+.gateway__meta { font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: rgba(244,241,232,.5); }
+.gateway__status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border: 1px solid rgba(244,241,232,.2);
+  align-self: flex-start;
+  margin-top: 4px;
+}
+.gateway__status .dot { background: var(--signal); }
+.gateway__status--warn .dot { background: var(--accent); }
+@media (max-width: 900px) { .gateways__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .gateways__grid { grid-template-columns: 1fr; } }
+
+/* =========================================================
+   DISCLAIMER
+   ========================================================= */
+.disclaimer {
+  padding: clamp(40px, 6vw, 88px) 0;
+  border-bottom: var(--border);
+  background: var(--accent); color: #fff;
+}
+.disclaimer__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: clamp(20px, 4vw, 64px);
+  align-items: start;
+}
+.disclaimer__tag {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: rgba(255,255,255,.75);
+  border: 1px solid rgba(255,255,255,.35);
+  padding: 4px 8px; display: inline-block;
+  margin-bottom: var(--s-3);
+}
+.disclaimer__title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(28px, 4.5vw, 56px);
+  line-height: 1; letter-spacing: -0.03em;
+  text-transform: uppercase; margin: 0;
+}
+.disclaimer__text { font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6; margin: 0 0 var(--s-3); }
+.disclaimer__text:last-child { margin-bottom: 0; }
+.disclaimer__text strong { font-weight: 700; }
+@media (max-width: 780px) { .disclaimer__inner { grid-template-columns: 1fr; } }
+
+/* =========================================================
+   INTRO
+   ========================================================= */
+.intro { padding: clamp(56px, 8vw, 128px) 0; border-bottom: var(--border); }
+.intro__title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(32px, 8vw, 128px);
+  line-height: .9; letter-spacing: -0.035em;
+  text-transform: uppercase;
+  margin: 0 0 var(--s-5);
+  display: flex; flex-direction: column;
+}
+.intro__lead {
+  max-width: 62ch;
+  font-size: clamp(15px, 1.3vw, 19px);
+  color: #232323;
+  margin-bottom: var(--s-6);
+}
+.intro__lead em { font-style: italic; color: var(--accent); }
+.equation {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  gap: var(--s-2) var(--s-3);
+  padding: var(--s-5) 0;
+  border-top: var(--border-2);
+  border-bottom: var(--border-2);
+  font-family: var(--font-mono);
+  font-size: clamp(15px, 2.2vw, 32px);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: var(--s-6);
+}
+.eq-op { color: var(--accent); }
+.eq-result { color: var(--accent); font-weight: 600; }
+.blocks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: var(--border);
+  border-left: var(--border);
+}
+.block {
+  border-right: var(--border);
+  border-bottom: var(--border);
+  padding: var(--s-4);
+  background: var(--bg);
+  transition: background .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.block:hover { background: var(--neutral); transform: translate(-3px,-3px); box-shadow: 5px 5px 0 var(--ink); }
+.block__num { font-family: var(--font-mono); font-size: 12px; letter-spacing: .16em; color: var(--accent); margin: 0 0 var(--s-3); }
+.block h3 {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.2vw, 32px);
+  font-weight: 700; letter-spacing: -0.02em;
+  text-transform: uppercase; margin: 0 0 var(--s-2);
+}
+.block p { margin: 0; color: #333; }
+@media (max-width: 780px) { .blocks { grid-template-columns: 1fr; } }
+
+/* =========================================================
+   FEATURES
+   ========================================================= */
+.features { padding: clamp(56px, 8vw, 128px) 0; border-bottom: var(--border); }
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-top: var(--border-2);
+  border-left: var(--border-2);
+}
+.bento__cell {
+  border-right: var(--border-2);
+  border-bottom: var(--border-2);
+  padding: clamp(20px, 2.4vw, 32px);
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  min-height: 220px;
+  transition: background .25s var(--ease), transform .25s var(--ease);
+}
+.bento__cell:hover { background: var(--neutral); transform: translateY(-4px); }
+.bento__cell--lg   { grid-column: span 4; min-height: 320px; }
+.bento__cell--wide { grid-column: span 6; min-height: 180px; }
+.bento__cell:not(.bento__cell--lg):not(.bento__cell--wide) { grid-column: span 2; }
+.bento__num { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; color: var(--accent); margin: 0 0 var(--s-3); }
+.bento__cell h3 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 40px);
+  letter-spacing: -0.02em; line-height: 1;
+  text-transform: uppercase;
+  margin: 0 0 var(--s-2);
+}
+.bento__cell--lg h3 { font-size: clamp(28px, 4.6vw, 72px); }
+.bento__cell p { margin: 0 0 var(--s-3); color: #333; max-width: 52ch; }
+.bento__meta { margin-top: auto; font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 900px) {
+  .bento { grid-template-columns: 1fr; }
+  .bento__cell, .bento__cell--lg, .bento__cell--wide { grid-column: auto; min-height: 0; }
+}
+
+/* =========================================================
+   NEPAL
+   ========================================================= */
+.nepal { padding: clamp(56px, 8vw, 128px) 0; border-bottom: var(--border); overflow: hidden; }
+.nepal__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+  gap: clamp(24px, 5vw, 80px);
+  align-items: end;
+}
+.nepal__code {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(80px, 16vw, 260px);
+  line-height: .8; letter-spacing: -0.05em;
+  margin: var(--s-3) 0; color: var(--accent);
+}
+.nepal__title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(30px, 5.4vw, 80px);
+  line-height: .95; letter-spacing: -0.03em;
+  text-transform: uppercase; margin: 0;
+  display: flex; flex-direction: column;
+}
+.nepal__right p { margin: 0 0 var(--s-3); max-width: 54ch; color: #232323; }
+.nepal__note { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; color: var(--muted); }
+@media (max-width: 900px) { .nepal__grid { grid-template-columns: 1fr; align-items: start; } }
+
+/* =========================================================
+   SECURITY
+   ========================================================= */
+.security {
+  background: var(--ink); color: var(--bg);
+  padding: clamp(56px, 8vw, 128px) 0;
+  border-bottom: var(--border);
+}
+.security__title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(42px, 10vw, 160px);
+  line-height: .88; letter-spacing: -0.035em;
+  text-transform: uppercase;
+  margin: var(--s-3) 0 var(--s-6);
+  display: flex; flex-direction: column;
+}
+.security__steps { list-style: none; padding: 0; margin: 0 0 var(--s-6); border-top: 1px solid rgba(244,241,232,.25); }
+.security__steps li {
+  display: flex; align-items: baseline; gap: var(--s-4);
+  padding: var(--s-3) 0; border-bottom: 1px solid rgba(244,241,232,.25);
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.8vw, 44px);
+  font-weight: 600; text-transform: uppercase; letter-spacing: -0.02em;
+}
+.security__steps span { font-family: var(--font-mono); font-size: 13px; letter-spacing: .18em; color: var(--accent); }
+.security__statement {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(34px, 7.5vw, 120px);
+  line-height: .92; letter-spacing: -0.03em;
+  text-transform: uppercase; margin: 0;
+}
+
+/* =========================================================
+   HOW
+   ========================================================= */
+.how { padding: clamp(56px, 8vw, 128px) 0; border-bottom: var(--border); }
+.timeline { list-style: none; padding: 0; margin: 0; border-top: var(--border-2); }
+.timeline__item {
+  display: grid;
+  grid-template-columns: minmax(80px,140px) 1fr;
+  gap: var(--s-4); align-items: start;
+  padding: var(--s-5) 0; border-bottom: var(--border-2);
+  transition: background .25s var(--ease), padding-left .25s var(--ease);
+}
+.timeline__item:hover { background: var(--neutral); padding-left: var(--s-3); }
+.timeline__num {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(36px, 5.5vw, 96px);
+  line-height: .9; letter-spacing: -0.04em; color: var(--accent); margin: 0;
+}
+.timeline__body h3 {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.8vw, 44px);
+  font-weight: 700; letter-spacing: -0.02em;
+  text-transform: uppercase; margin: 0 0 var(--s-2);
+}
+.timeline__body p { margin: 0; max-width: 56ch; color: #232323; }
+@media (max-width: 640px) { .timeline__item { grid-template-columns: 1fr; gap: var(--s-2); } }
+
+/* =========================================================
+   MANIFESTO
+   ========================================================= */
+.manifesto { padding: clamp(56px, 8vw, 128px) 0; border-bottom: var(--border); }
+.manifesto__text {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(32px, 8vw, 140px);
+  line-height: .9; letter-spacing: -0.035em;
+  text-transform: uppercase; margin: 0 0 var(--s-4);
+  display: flex; flex-direction: column;
+}
+.manifesto__sig {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--muted); margin: 0;
+}
+
+/* =========================================================
+   ENTER
+   ========================================================= */
+.enter {
+  padding: clamp(56px, 8vw, 128px) 0;
+  border-bottom: var(--border);
+  background: var(--neutral);
+  position: relative; overflow: hidden;
+}
+.enter::after {
+  content: ""; position: absolute; right: -10%; top: -20%;
+  width: 60%; aspect-ratio: 1;
+  background: radial-gradient(circle, rgba(255,77,0,.18), transparent 60%);
+  pointer-events: none;
+}
+.enter__title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(32px, 8vw, 128px);
+  line-height: .9; letter-spacing: -0.035em;
+  text-transform: uppercase;
+  margin: 0 0 var(--s-5);
+  display: flex; flex-direction: column;
+}
+.enter__tags {
+  display: flex; gap: var(--s-2); flex-wrap: wrap;
+  margin-top: var(--s-4);
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+.footer {
+  border-top: var(--border-2);
+  padding: var(--s-6) 0 calc(var(--s-5) + env(safe-area-inset-bottom, 0px));
+}
+.footer__inner {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr auto;
+  gap: var(--s-5); align-items: start;
+}
+.footer__logo { font-family: var(--font-display); font-weight: 700; font-size: 22px; margin: 0 0 var(--s-2); }
+.footer__logo span { color: var(--accent); }
+.footer__tag { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; line-height: 1.7; }
+.footer__links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: var(--s-2) var(--s-4);
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.footer__links a {
+  border-bottom: 1px solid transparent;
+  padding: 2px 0;
+  transition: color .2s var(--ease), border-color .2s var(--ease);
+}
+.footer__links a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+.footer__legal {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--muted); text-align: right; margin: 0;
+  line-height: 1.9;
+}
+.footer__legal a {
+  color: var(--accent);
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s var(--ease);
+}
+.footer__legal a:hover { border-bottom-color: var(--accent); }
+@media (max-width: 780px) {
+  .footer__inner { grid-template-columns: 1fr; }
+  .footer__legal { text-align: left; }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; }
+  .hero__title > span,
+  .hero__copy, .hero__actions, .hero__meta, .hero__right,
+  .hero__left .eyebrow { opacity: 1 !important; transform: none !important; }
+}
+
+/* =========================================================
+   LANDSCAPE PHONE (very short)
+   ========================================================= */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero {
+    min-height: auto;
+    padding-top: calc(var(--nav-h) + var(--s-3));
+    padding-bottom: var(--s-3);
+  }
+  .hero__title { font-size: clamp(32px, 6vw, 56px); }
+  .hero__copy { font-size: 14px; }
+  .hero__meta { display: none; }
+}
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+@media print {
+  .nav, .menu, .ticker, .scroll-bar, .hero__right { display: none; }
+  body { background: #fff; }
+  .reveal { opacity: 1; transform: none; }
+  section { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="scroll-bar" id="scrollBar" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="#top">SMS<span class="nav__brand-accent">ADDA</span></a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#purpose">Purpose</a>
+      <a href="#gateways">Gateways</a>
+      <a href="#security">Security</a>
+      <a href="#how">How it works</a>
+      <a href="#about">About</a>
+    </nav>
+    <a class="btn btn--cta nav__cta" href="get-started.html"><span>Get Started ↗</span></a>
+    <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="menu">Menu</button>
+  </div>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Main menu">
+  <nav class="menu__nav" aria-label="Mobile">
+    <a class="menu__link" href="#purpose">Purpose <small>01</small></a>
+    <a class="menu__link" href="#gateways">Gateways <small>02</small></a>
+    <a class="menu__link" href="#security">Security <small>03</small></a>
+    <a class="menu__link" href="#how">How it works <small>04</small></a>
+    <a class="menu__link" href="#about">About <small>05</small></a>
+  </nav>
+  <div class="menu__foot">
+    <span>Built in Nepal · +977</span>
+    <a class="btn menu__cta" href="get-started.html"><span>Get Started ↗</span></a>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ============================ HERO ============================ -->
+<section class="hero" id="top">
+  <div class="hero__grid">
+    <div class="hero__left">
+      <p class="eyebrow">
+        <span>Nepal's SMS Lab</span>
+        <span class="eyebrow__dot" aria-hidden="true">·</span>
+        <span>V1.0.0 / Online</span>
+      </p>
+      <h1 class="hero__title">
+        <span>SMS</span>
+        <span>is a</span>
+        <span class="hero__title-accent">mess.</span>
+      </h1>
+      <p class="hero__copy">
+        SMS Adda is a security research playground that reveals how vulnerable
+        and easy-to-detect faults exist across Nepal's SMS infrastructure — and
+        what that means for defenders.
+      </p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="get-started.html"><span>Get Started ↗</span></a>
+        <a class="btn btn--ghost" href="#purpose"><span>Our purpose</span></a>
+      </div>
+      <p class="hero__meta">
+        <span>+977</span>
+        <span>Research mode</span>
+        <span>Signal detected</span>
+      </p>
+    </div>
+
+    <aside class="hero__right" aria-label="SMS Adda system panel">
+      <div class="panel">
+        <div class="panel__head">
+          <span>SMS ADDA / LIVE</span>
+          <span class="panel__head-meta">01 / SYSTEM</span>
+        </div>
+        <div class="panel__body">
+          <p class="panel__label">Number</p>
+          <p class="panel__big">+977</p>
+          <p class="panel__sub">SMS SIGNAL</p>
+          <p class="panel__label panel__label--mt">Message pipeline</p>
+          <div class="panel__bars" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <ul class="panel__rows">
+            <li><span class="dot dot--on"></span> System <b>Online</b></li>
+            <li><span class="dot dot--on"></span> Queue <b>Ready</b></li>
+            <li><span class="dot dot--warn"></span> Research <b>Safe</b></li>
+          </ul>
+        </div>
+        <div class="panel__foot">
+          <span>Controlled environment</span>
+          <span class="panel__foot-mark" aria-hidden="true">✱</span>
+        </div>
+      </div>
+      <span class="anno anno--cross" aria-hidden="true">✕</span>
+      <span class="anno anno--coord" aria-hidden="true">27.7172° N / 85.3240° E</span>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================ TICKER ============================ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track">
+    <span>SMS Adda</span><span class="ticker__sep">•</span>
+    <span>Built in Nepal</span><span class="ticker__sep">•</span>
+    <span>Security research</span><span class="ticker__sep">•</span>
+    <span>Mapping vulnerabilities</span><span class="ticker__sep">•</span>
+    <span>Responsible testing</span><span class="ticker__sep">•</span>
+    <span>SMS Adda</span><span class="ticker__sep">•</span>
+    <span>Built in Nepal</span><span class="ticker__sep">•</span>
+    <span>Security research</span><span class="ticker__sep">•</span>
+    <span>Mapping vulnerabilities</span><span class="ticker__sep">•</span>
+    <span>Responsible testing</span><span class="ticker__sep">•</span>
+  </div>
+</div>
+
+<!-- ============================ PURPOSE ============================ -->
+<section class="purpose" id="purpose">
+  <div class="wrap">
+    <p class="section-tag reveal">01 / Purpose</p>
+    <h2 class="purpose__title">
+      <span class="reveal">Why we</span>
+      <span class="reveal" style="--d:80ms">built this</span>
+      <span class="reveal u-accent" style="--d:160ms">adda.</span>
+    </h2>
+    <p class="purpose__lead reveal">
+      The purpose of <strong>SMS Adda</strong> is to understand <strong>how vulnerable</strong>
+      and <strong>how easy it is to detect</strong> faults and weak points inside automated
+      SMS systems. During this research, we identified several of these weak
+      points across different platforms and services — and we document them here
+      so defenders, developers, and students can learn from them.
+    </p>
+    <div class="purpose__cards">
+      <div class="purpose__card reveal">
+        <span class="purpose__card-num">01 / VULNERABILITY</span>
+        <h4>How systems break</h4>
+        <p>Small oversights in queue handling, rate limiting, and validation turn into
+           systemic weaknesses. We map them, one gateway at a time.</p>
+      </div>
+      <div class="purpose__card reveal" style="--d:120ms">
+        <span class="purpose__card-num">02 / DETECTION</span>
+        <h4>How easy it is to spot</h4>
+        <p>Many of these weak points are trivially observable from the outside.
+           That visibility is itself a finding worth documenting.</p>
+      </div>
+      <div class="purpose__card reveal" style="--d:240ms">
+        <span class="purpose__card-num">03 / DISCLOSURE</span>
+        <h4>What we do with it</h4>
+        <p>We publish the pattern, not the exploit. The goal is defensive literacy,
+           not a weaponised tool.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ GATEWAYS ============================ -->
+<section class="gateways" id="gateways">
+  <div class="wrap gateways__inner">
+    <p class="section-tag section-tag--light reveal">02 / Gateways</p>
+    <h2 class="gateways__title">
+      <span class="reveal">Six weak</span>
+      <span class="reveal" style="--d:80ms">points we</span>
+      <span class="reveal u-accent" style="--d:160ms">mapped.</span>
+    </h2>
+    <p class="gateways__lead reveal">
+      Each of these services exposes a different kind of weakness in the SMS
+      pipeline. Some are rate-limit gaps. Some are session handling flaws. Some
+      are simply unauthenticated OTP triggers that were never meant to be hit
+      programmatically. Names are listed because they are the subject of public
+      security research — not targets for abuse.
+    </p>
+    <div class="gateways__grid">
+      <article class="gateway reveal">
+        <span class="gateway__num">GW-01</span>
+        <h3 class="gateway__name">ClampHook</h3>
+        <span class="gateway__meta">Registration flow</span>
+        <span class="gateway__status"><span class="dot"></span> Session flaw</span>
+      </article>
+      <article class="gateway reveal" style="--d:60ms">
+        <span class="gateway__num">GW-02</span>
+        <h3 class="gateway__name">Ambition Guru</h3>
+        <span class="gateway__meta">Education platform</span>
+        <span class="gateway__status"><span class="dot"></span> Rate-limit gap</span>
+      </article>
+      <article class="gateway reveal" style="--d:120ms">
+        <span class="gateway__num">GW-03</span>
+        <h3 class="gateway__name">MeroDoctor</h3>
+        <span class="gateway__meta">Health platform</span>
+        <span class="gateway__status"><span class="dot"></span> Session flaw</span>
+      </article>
+      <article class="gateway reveal" style="--d:180ms">
+        <span class="gateway__num">GW-04</span>
+        <h3 class="gateway__name">College Info</h3>
+        <span class="gateway__meta">Education portal</span>
+        <span class="gateway__status gateway__status--warn"><span class="dot"></span> Unauthed OTP</span>
+      </article>
+      <article class="gateway reveal" style="--d:240ms">
+        <span class="gateway__num">GW-05</span>
+        <h3 class="gateway__name">Pariksha</h3>
+        <span class="gateway__meta">Exam platform</span>
+        <span class="gateway__status gateway__status--warn"><span class="dot"></span> Unauthed OTP</span>
+      </article>
+      <article class="gateway reveal" style="--d:300ms">
+        <span class="gateway__num">GW-06</span>
+        <h3 class="gateway__name">QuickConnect</h3>
+        <span class="gateway__meta">Service platform</span>
+        <span class="gateway__status"><span class="dot"></span> Registration flow</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DISCLAIMER ============================ -->
+<section class="disclaimer">
+  <div class="wrap disclaimer__inner">
+    <div>
+      <span class="disclaimer__tag reveal">Important notice</span>
+      <h2 class="disclaimer__title reveal" style="--d:60ms">
+        Educational<br/>use only.
+      </h2>
+    </div>
+    <div>
+      <p class="disclaimer__text reveal" style="--d:120ms">
+        SMS Adda exists for <strong>education</strong> and for <strong>testing</strong>.
+        Everything here is meant to be studied in controlled environments, on
+        your own numbers, and only with consent.
+      </p>
+      <p class="disclaimer__text reveal" style="--d:180ms">
+        <strong>Do not use this project to harm others.</strong> Do not target
+        numbers that are not yours. Do not use anything learned here to harass,
+        flood, or abuse anyone.
+      </p>
+      <p class="disclaimer__text reveal" style="--d:240ms">
+        We are <strong>not responsible for any misuse</strong> of this project or
+        the knowledge shared on it. Use at your own risk, and use it responsibly.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ INTRO ============================ -->
+<section class="intro" id="about">
+  <div class="wrap">
+    <p class="section-tag reveal">03 / Intro</p>
+    <h2 class="intro__title">
+      <span class="reveal">We built</span>
+      <span class="reveal" style="--d:80ms">a digital</span>
+      <span class="reveal u-accent" style="--d:160ms">adda.</span>
+    </h2>
+    <p class="intro__lead reveal">
+      An <em>adda</em> is where people gather to talk, argue, and figure things out.
+      SMS Adda is the same idea applied to SMS infrastructure — a place to look
+      closely at how automated messaging behaves, and what that means for defence.
+    </p>
+    <div class="equation reveal" aria-label="SMS plus research plus security equals Adda">
+      <span>SMS</span>
+      <span class="eq-op">+</span>
+      <span>Research</span>
+      <span class="eq-op">+</span>
+      <span>Security</span>
+      <span class="eq-op">=</span>
+      <span class="eq-result">Adda</span>
+    </div>
+    <div class="blocks">
+      <article class="block reveal">
+        <p class="block__num">01</p>
+        <h3>Understand</h3>
+        <p>Learn how automated SMS systems behave, from queue to delivery.</p>
+      </article>
+      <article class="block reveal" style="--d:90ms">
+        <p class="block__num">02</p>
+        <h3>Observe</h3>
+        <p>Study traffic patterns and the behaviour of the systems carrying them.</p>
+      </article>
+      <article class="block reveal" style="--d:180ms">
+        <p class="block__num">03</p>
+        <h3>Protect</h3>
+        <p>Turn observation into defensive design and abuse prevention.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FEATURES ============================ -->
+<section class="features">
+  <div class="wrap">
+    <p class="section-tag reveal">04 / System</p>
+    <div class="bento">
+      <article class="bento__cell bento__cell--lg reveal">
+        <p class="bento__num">01</p>
+        <h3>SMS Research</h3>
+        <p>A controlled environment for studying how SMS pipelines behave under
+           automated load, without pointing that load at real people.</p>
+        <p class="bento__meta">Module · Research</p>
+      </article>
+      <article class="bento__cell reveal" style="--d:80ms">
+        <p class="bento__num">02</p>
+        <h3>Traffic Analysis</h3>
+        <p>Read the shape of the traffic — volume, timing, routing.</p>
+        <p class="bento__meta">Module · Analysis</p>
+      </article>
+      <article class="bento__cell reveal" style="--d:160ms">
+        <p class="bento__num">03</p>
+        <h3>System Behaviour</h3>
+        <p>Watch what the system does, not just what it says.</p>
+        <p class="bento__meta">Module · Behaviour</p>
+      </article>
+      <article class="bento__cell reveal" style="--d:240ms">
+        <p class="bento__num">04</p>
+        <h3>Security Awareness</h3>
+        <p>Make the invisible parts of SMS legible to the people who defend it.</p>
+        <p class="bento__meta">Module · Awareness</p>
+      </article>
+      <article class="bento__cell bento__cell--wide reveal" style="--d:320ms">
+        <p class="bento__num">05</p>
+        <h3>Responsible Testing</h3>
+        <p>Everything here runs against controlled targets. The point is to
+           understand the system — not to abuse it.</p>
+        <p class="bento__meta">Module · Ethics</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ NEPAL ============================ -->
+<section class="nepal">
+  <div class="wrap nepal__grid">
+    <div class="nepal__left">
+      <p class="section-tag reveal">05 / Origin</p>
+      <p class="nepal__code reveal">+977</p>
+      <h2 class="nepal__title">
+        <span class="reveal">Built for the</span>
+        <span class="reveal u-accent" style="--d:80ms">Nepali internet.</span>
+      </h2>
+    </div>
+    <div class="nepal__right">
+      <p class="reveal">
+        SMS Adda is an independent project conceived in Nepal. It exists because
+        the country's messaging infrastructure deserves to be understood by the
+        people who live inside it — not only by vendors and gatekeepers.
+      </p>
+      <p class="nepal__note reveal" style="--d:80ms">
+        No telecom partnership is implied. This is a local research project.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SECURITY ============================ -->
+<section class="security" id="security">
+  <div class="wrap">
+    <p class="section-tag section-tag--light reveal">06 / Security</p>
+    <h2 class="security__title">
+      <span class="reveal">Security</span>
+      <span class="reveal" style="--d:80ms">is not</span>
+      <span class="reveal u-accent" style="--d:160ms">optional.</span>
+    </h2>
+    <ol class="security__steps">
+      <li class="reveal"><span>01</span> Identify</li>
+      <li class="reveal" style="--d:80ms"><span>02</span> Understand</li>
+      <li class="reveal" style="--d:160ms"><span>03</span> Defend</li>
+    </ol>
+    <p class="security__statement reveal">
+      Don't<br/>
+      just<br/>
+      block it.<br/>
+      <span class="u-accent">Understand it.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ============================ TICKER 2 ============================ -->
+<div class="ticker ticker--reverse" aria-hidden="true">
+  <div class="ticker__track">
+    <span>Understand the signal</span><span class="ticker__sep">•</span>
+    <span>Study the system</span><span class="ticker__sep">•</span>
+    <span>Build better defences</span><span class="ticker__sep">•</span>
+    <span>Responsible testing</span><span class="ticker__sep">•</span>
+    <span>Understand the signal</span><span class="ticker__sep">•</span>
+    <span>Study the system</span><span class="ticker__sep">•</span>
+    <span>Build better defences</span><span class="ticker__sep">•</span>
+    <span>Responsible testing</span><span class="ticker__sep">•</span>
+  </div>
+</div>
+
+<!-- ============================ HOW ============================ -->
+<section class="how" id="how">
+  <div class="wrap">
+    <p class="section-tag reveal">07 / How it works</p>
+    <ol class="timeline">
+      <li class="timeline__item reveal">
+        <p class="timeline__num">01</p>
+        <div class="timeline__body">
+          <h3>Input</h3>
+          <p>A controlled research scenario begins.</p>
+        </div>
+      </li>
+      <li class="timeline__item reveal" style="--d:80ms">
+        <p class="timeline__num">02</p>
+        <div class="timeline__body">
+          <h3>Process</h3>
+          <p>System behaviour is observed as it happens.</p>
+        </div>
+      </li>
+      <li class="timeline__item reveal" style="--d:160ms">
+        <p class="timeline__num">03</p>
+        <div class="timeline__body">
+          <h3>Analyse</h3>
+          <p>Traffic and patterns are examined for meaning.</p>
+        </div>
+      </li>
+      <li class="timeline__item reveal" style="--d:240ms">
+        <p class="timeline__num">04</p>
+        <div class="timeline__body">
+          <h3>Learn</h3>
+          <p>The result becomes defensive knowledge.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================ MANIFESTO ============================ -->
+<section class="manifesto">
+  <div class="wrap">
+    <p class="manifesto__text">
+      <span class="reveal">SMS is</span>
+      <span class="reveal u-accent" style="--d:60ms">old.</span>
+      <span class="reveal" style="--d:120ms">The internet</span>
+      <span class="reveal" style="--d:180ms">is not.</span>
+      <span class="reveal" style="--d:240ms">So we</span>
+      <span class="reveal" style="--d:300ms">study</span>
+      <span class="reveal" style="--d:360ms">both.</span>
+    </p>
+    <p class="manifesto__sig reveal">— SMS Adda / 2026</p>
+  </div>
+</section>
+
+<!-- ============================ ENTER ============================ -->
+<section class="enter" id="enter">
+  <div class="wrap enter__inner">
+    <h2 class="enter__title">
+      <span class="reveal">Ready to enter</span>
+      <span class="reveal u-accent" style="--d:80ms">the adda?</span>
+    </h2>
+    <a class="btn btn--primary btn--xl reveal" href="get-started.html" style="--d:160ms">
+      <span>Get Started ↗</span>
+    </a>
+    <p class="enter__tags reveal" style="--d:220ms">
+      <span>Educational</span><span>•</span>
+      <span>Security</span><span>•</span>
+      <span>Research</span>
+    </p>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <div class="footer__brand">
+      <p class="footer__logo">SMS<span>ADDA</span></p>
+      <p class="footer__tag">Security research.<br/>Responsible experimentation.</p>
+    </div>
+    <nav class="footer__links" aria-label="Footer">
+      <a href="#purpose">Purpose</a>
+      <a href="#gateways">Gateways</a>
+      <a href="#security">Security</a>
+      <a href="#how">How it works</a>
+      <a href="/about.html">About</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="get-started.html">Get started</a>
+    </nav>
+    <p class="footer__legal">
+      Built by <a href="https://laxman-poudel.com.np" target="_blank" rel="noopener">Laxman Poudel</a><br/>
+      Built in Nepal<br/>
+      © 2026 SMS Adda
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- Scroll progress bar ---- */
+  var bar = document.getElementById("scrollBar");
+  var ticking = false;
+  function updateBar() {
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    bar.style.width = pct + "%";
+    ticking = false;
+  }
+  window.addEventListener("scroll", function () {
+    if (!ticking) { requestAnimationFrame(updateBar); ticking = true; }
+  }, { passive: true });
+  window.addEventListener("resize", updateBar);
+  updateBar();
+
+  /* ---- Hide-on-scroll nav ---- */
+  var nav = document.getElementById("nav");
+  var lastY = window.pageYOffset;
+  window.addEventListener("scroll", function () {
+    var y = window.pageYOffset;
+    if (document.body.classList.contains("menu-open")) { lastY = y; return; }
+    if (y > 120 && y > lastY + 6) nav.classList.add("is-hidden");
+    else if (y < lastY - 6 || y < 60) nav.classList.remove("is-hidden");
+    lastY = y;
+  }, { passive: true });
+
+  /* ---- Mobile menu ---- */
+  var toggle = document.getElementById("navToggle");
+  var menu   = document.getElementById("menu");
+  function setMenu(open) {
+    menu.classList.toggle("is-open", open);
+    document.body.classList.toggle("menu-open", open);
+    document.body.classList.toggle("no-scroll", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.textContent = open ? "Close" : "Menu";
+  }
+  toggle.addEventListener("click", function () { setMenu(!menu.classList.contains("is-open")); });
+  menu.querySelectorAll("a").forEach(function (a) {
+    a.addEventListener("click", function () { setMenu(false); });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && menu.classList.contains("is-open")) setMenu(false);
+  });
+
+  /* ---- Hero entrance ---- */
+  var hero = document.querySelector(".hero");
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () { hero.classList.add("is-ready"); });
+  });
+
+  /* ---- Reveal on scroll ---- */
+  var reveals = document.querySelectorAll(".reveal");
+  if (!reduceMotion && "IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-in");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+    reveals.forEach(function (el) { io.observe(el); });
+  } else {
+    reveals.forEach(function (el) { el.classList.add("is-in"); });
+  }
+
+  /* ---- Smooth scroll for internal anchors ---- */
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      var href = a.getAttribute("href");
+      if (href === "#" || href.length < 2) return;
+      var target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      if (reduceMotion) {
+        target.scrollIntoView();
+      } else {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      history.replaceState(null, "", href);
+    });
+  });
+
+  /* ---- iOS double-tap zoom safety net ---- */
+  var lastTouch = 0;
+  document.addEventListener("touchend", function (e) {
+    var now = Date.now();
+    if (now - lastTouch < 350) {
+      var el = e.target && e.target.closest && e.target.closest("button, a, .btn, .nav__link, .menu__link");
+      if (el) e.preventDefault();
+    }
+    lastTouch = now;
+  }, { passive: false });
+
+})();
+</script>
+</body>
+</html>
