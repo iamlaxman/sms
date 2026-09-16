@@ -57,6 +57,9 @@
   --bg:       #F4F1E8;
   --ink:      #0a0a0a;
   --ink-2:    #0d0d0d;
+  --field-bg: #141414;
+  --field-bg-focus: #191919;
+  --field-bg-error: #1a0f08;
   --accent:   #FF4D00;
   --accent-2: #FF8A3D;
   --neutral:  #E5E0D5;
@@ -117,17 +120,8 @@ a { color: inherit; text-decoration: none; -webkit-user-select: none; user-selec
 input { font: inherit; color: inherit; }
 ::selection { background: var(--accent); color: #fff; }
 
-/* =========================================================
-   FOCUS / OUTLINE — kill all rings and highlights
-   ========================================================= */
-a:focus, button:focus, input:focus { outline: none; }
-input:focus,
-input:focus-visible,
-input:active {
-  outline: none;
-  box-shadow: none;
-  -webkit-tap-highlight-color: transparent;
-}
+/* Focus — clean for keyboard, silent for mouse/touch */
+a:focus, button:focus { outline: none; }
 a:focus-visible, button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -327,7 +321,6 @@ a:focus-visible, button:focus-visible {
   align-items: start;
 }
 
-/* Desktop: fit viewport, no page scroll */
 @media (min-width: 1024px) {
   html, body {
     height: 100%;
@@ -364,7 +357,6 @@ a:focus-visible, button:focus-visible {
   }
 }
 
-/* Tablet/Mobile: natural page scroll, terminal always visible */
 @media (max-width: 1023px) {
   .workspace__inner {
     padding: 16px 16px 32px;
@@ -444,28 +436,27 @@ a:focus-visible, button:focus-visible {
 }
 
 /* =========================================================
-   PHONE FIELD — no ring, no box on focus
+   PHONE FIELD — solid background, no box shadows, no autofill flash
    ========================================================= */
 .field__wrap {
   display: flex;
   align-items: center;
-  background: rgba(255,255,255,.045);
+  background: var(--field-bg);           /* solid, not translucent */
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 999px;
   min-height: 52px;
   padding: 0 18px;
   transition: border-color .2s var(--ease), background .2s var(--ease);
 }
-/* Focus: only a subtle border tint — no shadow ring, no box */
 .field__wrap:focus-within {
   border-color: rgba(255,77,0,.45);
-  background: rgba(255,255,255,.055);
+  background: var(--field-bg-focus);      /* solid focus color */
   box-shadow: none;
   outline: none;
 }
 .field__wrap.error {
   border-color: rgba(255,77,0,.7);
-  background: rgba(255,77,0,.06);
+  background: var(--field-bg-error);
 }
 
 .field__icon {
@@ -505,9 +496,9 @@ a:focus-visible, button:focus-visible {
 .field__input {
   flex: 1 1 auto;
   min-width: 0;
-  background: transparent;
-  border: 0;
-  outline: none;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
   color: var(--bg);
   font-family: var(--font-mono);
   font-size: 15px;
@@ -518,28 +509,55 @@ a:focus-visible, button:focus-visible {
   appearance: none;
   -webkit-appearance: none;
   font-variant-numeric: tabular-nums;
-  /* Kill every possible focus ring / box */
-  box-shadow: none;
-  -webkit-tap-highlight-color: transparent;
+  box-shadow: none !important;
+  caret-color: var(--accent);
+  -webkit-text-fill-color: var(--bg);
 }
 .field__input:focus,
 .field__input:focus-visible,
 .field__input:active {
-  outline: none !important;
+  outline: 0 !important;
   box-shadow: none !important;
   border: 0 !important;
+  background: transparent !important;
 }
+
 .field__input::placeholder {
   color: rgba(244,241,232,.28);
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
+  -webkit-text-fill-color: rgba(244,241,232,.28);
 }
+
+/* Selected text inside the input */
+.field__input::selection {
+  background: var(--accent);
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+.field__input::-moz-selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* =========================================================
+   AUTOFILL — match the pill exactly, no flash, no inset box
+   ========================================================= */
 .field__input:-webkit-autofill,
 .field__input:-webkit-autofill:hover,
-.field__input:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--bg);
-  -webkit-box-shadow: 0 0 0 1000px var(--ink) inset;
-  transition: background-color 9999s ease-out;
+.field__input:-webkit-autofill:focus,
+.field__input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--field-bg) inset !important;
+  box-shadow: 0 0 0 1000px var(--field-bg) inset !important;
+  -webkit-text-fill-color: var(--bg) !important;
+  caret-color: var(--accent) !important;
+  transition: background-color 9999s ease-out 0s,
+              color 9999s ease-out 0s !important;
+}
+/* When the wrapper is focused, autofill should match the focus color */
+.field__wrap:focus-within .field__input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--field-bg-focus) inset !important;
+  box-shadow: 0 0 0 1000px var(--field-bg-focus) inset !important;
 }
 
 .field__error {
@@ -553,7 +571,7 @@ a:focus-visible, button:focus-visible {
 }
 .field__error.show { display: block; }
 
-/* iOS: 16px min font to prevent auto-zoom on focus */
+/* iOS: 16px min font prevents auto-zoom on focus */
 @supports (-webkit-touch-callout: none) {
   .field__input { font-size: 16px; }
 }
@@ -565,7 +583,7 @@ a:focus-visible, button:focus-visible {
   display: grid;
   grid-template-columns: 1fr 1fr;
   border: 1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.045);
+  background: var(--field-bg);
   border-radius: 999px;
   min-height: 50px;
   padding: 4px;
@@ -604,7 +622,7 @@ a:focus-visible, button:focus-visible {
   display: flex;
   align-items: center;
   border: 1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.045);
+  background: var(--field-bg);
   border-radius: 999px;
   min-height: 52px;
   padding: 4px;
@@ -668,13 +686,13 @@ a:focus-visible, button:focus-visible {
 .bulk-row .field__input { padding: 12px 0; }
 .bulk-row.invalid .field__wrap {
   border-color: rgba(248,113,113,.6);
-  background: rgba(248,113,113,.06);
+  background: var(--field-bg-error);
 }
 .bulk-row__del {
   width: 48px;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.045);
+  background: var(--field-bg);
   color: rgba(244,241,232,.65);
   display: flex;
   align-items: center;
@@ -700,7 +718,7 @@ a:focus-visible, button:focus-visible {
   padding: 9px 12px;
   min-height: 42px;
   border: 1px solid rgba(255,255,255,.1);
-  background: rgba(255,255,255,.045);
+  background: var(--field-bg);
   color: var(--bg);
   font-family: var(--font-mono);
   font-size: 10px;
@@ -716,7 +734,7 @@ a:focus-visible, button:focus-visible {
   gap: 6px;
   white-space: nowrap;
 }
-.btn-mini:hover:not(:disabled) { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
+.btn-mini:hover:not(:disabled) { background: #1c1c1c; border-color: rgba(255,255,255,.2); }
 .btn-mini:disabled { opacity: .35; cursor: not-allowed; }
 .btn-mini svg {
   width: 13px;
@@ -780,7 +798,7 @@ a:focus-visible, button:focus-visible {
   display: flex; align-items: center; justify-content: center; gap: 6px;
   padding: 10px;
   border: 1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.045);
+  background: var(--field-bg);
   color: var(--bg);
   font-family: var(--font-mono);
   font-size: 10px;
@@ -802,7 +820,7 @@ a:focus-visible, button:focus-visible {
   color: #fff;
   box-shadow: 0 4px 12px rgba(255,77,0,.25);
 }
-.gw-opt:hover:not(.checked) { background: rgba(255,255,255,.08); }
+.gw-opt:hover:not(.checked) { background: #1c1c1c; }
 
 /* =========================================================
    TERMS
@@ -1346,15 +1364,19 @@ a:focus-visible, button:focus-visible {
                 <input
                   type="tel"
                   id="phone"
+                  name="smsadda_phone_noautofill"
                   class="field__input"
                   placeholder="98XXXXXXXX"
                   inputmode="numeric"
                   pattern="[0-9]*"
-                  autocomplete="tel-national"
-                  maxlength="10"
-                  spellcheck="false"
+                  autocomplete="off"
                   autocorrect="off"
                   autocapitalize="off"
+                  spellcheck="false"
+                  data-form-type="other"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  maxlength="10"
                 />
               </div>
               <p class="field__error" id="phoneError">Enter a valid 10-digit number starting with 98 or 97</p>
@@ -1762,7 +1784,7 @@ a:focus-visible, button:focus-visible {
     row.innerHTML =
       '<div class="field__wrap">' +
         '<span class="field__prefix">+977</span>' +
-        '<input type="tel" class="field__input" placeholder="98XXXXXXXX" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />' +
+        '<input type="tel" class="field__input" placeholder="98XXXXXXXX" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true" />' +
       '</div>' +
       '<button type="button" class="bulk-row__del" aria-label="Remove">×</button>';
     var input = row.querySelector("input");
